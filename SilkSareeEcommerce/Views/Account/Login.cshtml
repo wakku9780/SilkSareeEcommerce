@@ -1,0 +1,32 @@
+﻿@model SilkSareeEcommerce.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h2>Login</h2>
+<form asp-action="Login" method="post">
+    <div class="form-group">
+        <label>Email</label>
+        <input asp-for="Email" type="email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-check">
+        <input asp-for="RememberMe" class="form-check-input" />
+        <label class="form-check-label">Remember Me</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+<p><a asp-action="ForgotPassword">Forgot Password?</a></p>
+<p>New User? <a asp-action="Register">Register Here</a></p>
+
+<!-- Google Login -->
+<form asp-action="GoogleLogin" method="post">
+    <button type="submit" class="btn btn-danger">Login with Google</button>
+</form>
