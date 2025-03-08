@@ -1,0 +1,39 @@
+﻿@model SilkSareeEcommerce.Models.Order
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-white text-center">
+            <h2 class="mb-0">📦 Order Details - ORD-@Model.Id</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Order ID:</strong> ORD-@Model.Id</p>
+            <p><strong>Total Amount:</strong> ₹@Model.TotalAmount</p>
+            <p><strong>Status:</strong> <span class="badge bg-primary">@Model.Status</span></p>
+
+            <hr />
+
+            <h5>🛍️ Ordered Products</h5>
+            <ul class="list-group">
+                @foreach (var item in Model.OrderItems)
+                {
+                    <li class="list-group-item">
+                        <strong>@item.Product.Name</strong> - ₹@item.Product.Price x @item.Quantity
+                    </li>
+                }
+            </ul>
+
+            <div class="mt-4">
+                <a asp-action="Index" class="btn btn-secondary">⬅ Back to Orders</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit Order
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete Order
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

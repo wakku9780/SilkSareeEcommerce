@@ -1,0 +1,17 @@
+﻿<h2>Wishlist</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+else if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<a asp-controller="Wishlist" asp-action="Index" class="btn btn-primary">Go to Wishlist</a>
+<a asp-controller="Product" asp-action="Index" class="btn btn-secondary">Continue Shopping</a>

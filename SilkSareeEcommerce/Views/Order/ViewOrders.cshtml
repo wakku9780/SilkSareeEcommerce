@@ -1,0 +1,42 @@
+﻿@model List<SilkSareeEcommerce.Models.Order>
+
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">My Orders</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-warning">You have not placed any orders yet.</div>
+    }
+    else
+    {
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Order Date</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>₹@order.TotalAmount</td>
+                        <td>@order.Status</td>
+                        <td>
+                            <a href="@Url.Action("OrderDetails", "Order", new { orderId = order.Id })" class="btn btn-info btn-sm">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SilkSareeEcommerce.Services;
 using SilkSareeEcommerce.Models;
-using Microsoft.AspNetCore.Cors.Infrastructure;
+using SilkSareeEcommerce.Services;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace SilkSareeEcommerce.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CartController : ControllerBase
+    public class CartController : Controller
     {
         private readonly CartService _cartService;
 
@@ -16,28 +15,58 @@ namespace SilkSareeEcommerce.Controllers
             _cartService = cartService;
         }
 
-        [HttpPost("add")]
-        public async Task<IActionResult> AddToCart([FromBody] CartItem item)
+        // ✅ Show Cart Items in UI
+        public async Task<IActionResult> Index()
         {
-            // Call the AddToCartAsync method without expecting a return value
-            await _cartService.AddToCartAsync(item.UserId, item.ProductId, item.Quantity);
-            return Ok();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction("Login", "Account"); // Agar user login nhi hai toh login page pe bhej do
+
+            var cartItems = await _cartService.GetCartItemsAsync(userId);
+            return View(cartItems); // Cart ke items ko view me bhej raha hoon
         }
 
-
-        [HttpDelete("remove/{productId}")]
-        public async Task<IActionResult> RemoveFromCart(string userId, int productId)
+        // ✅ Add Product to Cart
+        [HttpPost]
+        public async Task<IActionResult> AddToCart(int productId, int quantity)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            await _cartService.AddToCartAsync(userId, productId, quantity);
+            return RedirectToAction("Index"); // Cart page pe redirect
+        }
+
+        // ✅ Remove Item from Cart
+        [HttpPost]
+        public async Task<IActionResult> RemoveFromCart(int productId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction("Login", "Account");
+
             await _cartService.RemoveFromCartAsync(userId, productId);
-            return NoContent();
+            return RedirectToAction("Index");
         }
 
-
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetCartByUserId(string userId)
+        // ✅ Clear Entire Cart
+        [HttpPost]
+        public async Task<IActionResult> ClearCart()
         {
-            var cart = await _cartService.GetCartByUserIdAsync(userId);
-            return Ok(cart);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            await _cartService.ClearCartAsync(userId);
+            return RedirectToAction("Index");
+        }
+
+        // ✅ Update Quantity in Cart (Increase/Decrease)
+        [HttpPost]
+        public async Task<IActionResult> UpdateCartQuantity(int productId, string action)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            var result = await _cartService.UpdateCartQuantityAsync(userId, productId, action);
+            return RedirectToAction("Index");
         }
     }
 }

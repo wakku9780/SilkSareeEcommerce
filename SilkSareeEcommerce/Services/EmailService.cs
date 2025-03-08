@@ -1,7 +1,5 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 
 namespace SilkSareeEcommerce.Services
@@ -15,25 +13,33 @@ namespace SilkSareeEcommerce.Services
             _configuration = configuration;
         }
 
-        public async Task SendEmailAsync(string toEmail, string subject, string body)
+        public void SendEmail(string toEmail, string subject, string body)
         {
-            var smtpClient = new SmtpClient(_configuration["Smtp:Host"])
+            var smtpSettings = _configuration.GetSection("EmailSettings");
+
+            string host = smtpSettings["SMTPServer"];
+            int port = int.Parse(smtpSettings["SMTPPort"]);
+            string username = smtpSettings["SenderEmail"];
+            string password = smtpSettings["SenderPassword"];
+
+            var smtpClient = new SmtpClient(host)
             {
-                Port = int.Parse(_configuration["Smtp:Port"]),
-                Credentials = new NetworkCredential(_configuration["Smtp:Username"], _configuration["Smtp:Password"]),
-                EnableSsl = true,
+                Port = port,
+                Credentials = new NetworkCredential(username, password),
+                EnableSsl = true
             };
 
             var mailMessage = new MailMessage
             {
-                From = new MailAddress(_configuration["Smtp:Username"]),
+                From = new MailAddress(username),
                 Subject = subject,
                 Body = body,
-                IsBodyHtml = true,
+                IsBodyHtml = true
             };
 
             mailMessage.To.Add(toEmail);
-            await smtpClient.SendMailAsync(mailMessage);
+
+            smtpClient.Send(mailMessage);
         }
     }
 }

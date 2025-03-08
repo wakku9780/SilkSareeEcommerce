@@ -1,0 +1,76 @@
+﻿@model IEnumerable<SilkSareeEcommerce.Models.Wishlist>
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-white text-center">
+            <h2 class="mb-0">❤️ My Wishlist</h2>
+        </div>
+        <div class="card-body">
+            @if (!Model.Any())
+            {
+                <p class="text-center">Your wishlist is empty!</p>
+            }
+            else
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    @foreach (var item in Model)
+                    {
+                        <div class="col">
+                            <div class="card shadow-lg border-0 h-100">
+                                <img src="@item.Product.ImageUrl" class="card-img-top" alt="@item.Product.Name">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">@item.Product.Name</h5>
+                                    <p class="text-success fw-bold fs-5">₹@item.Product.Price</p>
+
+                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@item.Product.Id" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </a>
+                                    <a asp-controller="Wishlist" asp-action="Remove" asp-route-wishlistId="@item.Id" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@* @model IEnumerable<SilkSareeEcommerce.Models.Wishlist>
+
+<h2>Your Wishlist</h2>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Product.Name</td>
+                    <td>₹@item.Product.Price</td>
+                    <td>
+                        <a asp-controller="Product" asp-action="Details" asp-route-id="@item.Product.Id" class="btn btn-primary">View</a>
+                        <a asp-controller="Wishlist" asp-action="Remove" asp-route-wishlistId="@item.Id" class="btn btn-danger">Remove</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Your wishlist is empty!</p>
+}
+<a asp-controller="Product" asp-action="Index" class="btn btn-secondary">Continue Shopping</a>
+ *@

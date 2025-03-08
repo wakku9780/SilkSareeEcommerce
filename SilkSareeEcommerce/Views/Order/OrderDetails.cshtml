@@ -1,0 +1,43 @@
+﻿@model SilkSareeEcommerce.Models.Order
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<div class="container mt-5">
+    <h2>Order Details</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Order ID: @Model.Id</h5>
+            <p><strong>Order Date:</strong> @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+            <p><strong>Total Amount:</strong> ₹@Model.TotalAmount</p>
+            <p><strong>Status:</strong> @Model.Status</p>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Order Items</h3>
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrderItems)
+            {
+                <tr>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>₹@item.Price</td>
+                    <td>₹@(item.Quantity * item.Price)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a href="@Url.Action("GetUserOrders", "Order")" class="btn btn-primary mt-3">Back to Orders</a>
+</div>

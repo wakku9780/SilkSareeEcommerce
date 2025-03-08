@@ -17,8 +17,9 @@ namespace SilkSareeEcommerce.Models
         [Range(1, 100000, ErrorMessage = "Price must be between 1 and 100000")]
         public decimal Price { get; set; }
 
-        [Required(ErrorMessage = "Image URL is required")]
-        public string ImageUrl { get; set; } = string.Empty;
+        // ❌ Remove [Required]
+        public string? ImageUrl { get; set; } = string.Empty;
+
 
         [Required(ErrorMessage = "Category is required")]
         public int CategoryId { get; set; }

@@ -27,12 +27,16 @@ builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IWishlistRepository,WishlistRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserOrderRepository, UserOrderRepository>();
 
 
 
 
 
 
+
+
+builder.Services.AddSingleton<CloudinaryService>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EmailService>();
@@ -42,8 +46,11 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<WishlistService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<UserOrderService>();
+builder.Services.AddScoped<PayPalService> ();
 
 
+builder.Services.AddScoped<UserService>();
 
 // Add Google Authentication
 builder.Services.AddAuthentication()

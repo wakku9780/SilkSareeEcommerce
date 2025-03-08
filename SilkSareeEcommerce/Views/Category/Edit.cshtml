@@ -1,0 +1,25 @@
+﻿@model SilkSareeEcommerce.Models.Category
+
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<h2>Edit Category</h2>
+
+<form asp-action="Edit" method="post" class="mt-3">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Name">Category Name</label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="Description">Description</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-warning mt-3">Update</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+</form>

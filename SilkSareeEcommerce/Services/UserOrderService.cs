@@ -7,9 +7,9 @@ namespace SilkSareeEcommerce.Services
 {
     public class UserOrderService  
     {
-        private readonly UserOrderRepository _userOrderRepository;
+        private readonly IUserOrderRepository _userOrderRepository;
 
-        public UserOrderService(UserOrderRepository userOrderRepository)
+        public UserOrderService(IUserOrderRepository userOrderRepository)
         {
             _userOrderRepository = userOrderRepository;
         }

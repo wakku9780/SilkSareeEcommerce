@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SilkSareeEcommerce.Data;
 using SilkSareeEcommerce.Models;
 
@@ -57,6 +58,41 @@ namespace SilkSareeEcommerce.Repositories
             _context.CartItems.RemoveRange(cartItems);
             await _context.SaveChangesAsync();
         }
+
+
+        public async Task<(int newQuantity, decimal newTotal, decimal cartTotal)> UpdateCartQuantityAsync(string userId, int productId, string action)
+        {
+            var cartItem = await _context.CartItems
+                .Include(c => c.Product)  // ✅ Product data include karo taaki price mile
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
+
+            if (cartItem == null)
+            {
+                return (-1, 0, 0); // ✅ Item not found case handle
+            }
+
+            if (action == "increase")
+            {
+                cartItem.Quantity += 1;
+            }
+            else if (action == "decrease" && cartItem.Quantity > 1)
+            {
+                cartItem.Quantity -= 1;
+            }
+
+            await _context.SaveChangesAsync();
+
+            // ✅ Calculate updated totals
+            decimal newTotal = cartItem.Quantity * cartItem.Product.Price;
+            decimal cartTotal = await _context.CartItems
+                .Where(c => c.UserId == userId)
+                .SumAsync(c => c.Quantity * c.Product.Price);
+
+            return (cartItem.Quantity, newTotal, cartTotal);
+        }
+
+
+
     }
 
 }

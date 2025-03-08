@@ -1,0 +1,78 @@
+﻿@model SilkSareeEcommerce.Models.CheckoutViewModel
+
+<h2>Checkout</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.CartItems)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Product.Price.ToString("C")</td>
+                <td>@(item.Quantity * item.Product.Price)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Total: @Model.TotalAmount.ToString("C")</h4>
+
+<form asp-controller="Order" asp-action="PlaceOrder" method="post">
+    <div class="form-group">
+        <label>Select Payment Method:</label>
+        <select asp-for="PaymentMethod" class="form-control" required>
+            <option value="COD">Cash on Delivery</option>
+            <option value="PayPal">Pay with PayPal</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Place Order</button>
+</form>
+
+
+@* @model List<SilkSareeEcommerce.Models.CartItem>
+
+
+<h2>Checkout</h2>
+
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Product.Price</td>
+                    <td>@(item.Quantity * item.Product.Price)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <form asp-controller="Order" asp-action="PlaceOrder" method="post">
+        <button type="submit" class="btn btn-primary">Place Order</button>
+    </form>
+}
+else
+{
+    <p>Your cart is empty.</p>
+}
+ *@

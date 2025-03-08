@@ -1,0 +1,370 @@
+﻿@model List<SilkSareeEcommerce.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Your Shopping Cart";
+}
+
+<h2>Your Shopping Cart</h2>
+
+@if (Model != null && Model.Count > 0)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr id="row-@item.ProductId">
+                    <td>
+                        <img src="@item.Product.ImageUrl" alt="Product Image" style="width: 50px; height: 50px;" />
+                    </td>
+                    <td>@item.Product.Name</td>
+                    <td id="price-@item.ProductId">@item.Product.Price.ToString("C")</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger update-quantity" data-product-id="@item.ProductId" data-action="decrease">-</button>
+                        <span id="quantity-@item.ProductId">@item.Quantity</span>
+                        <button class="btn btn-sm btn-success update-quantity" data-product-id="@item.ProductId" data-action="increase">+</button>
+                    </td>
+                    <td id="total-@item.ProductId">@((item.Product.Price * item.Quantity).ToString("C"))</td>
+                    <td>
+                        <button class="btn btn-danger remove-item" data-product-id="@item.ProductId">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Total Amount: <span id="cart-total">@Model.Sum(p => p.Product.Price * p.Quantity).ToString("C")</span></h4>
+
+    <a asp-action="Checkout" asp-controller="Product" class="btn btn-success">Proceed to Checkout</a>
+}
+else
+{
+    <p>Your cart is empty.</p>
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        // ✅ Increase/Decrease Quantity
+        $(".update-quantity").click(function () {
+            var productId = $(this).data("product-id");
+            var action = $(this).data("action");
+
+            $.ajax({
+                url: "/Product/UpdateCartQuantity",
+                type: "POST",
+                data: { productId: productId, action: action },
+                success: function (response) {
+                    if (response.success) {
+                        $("#quantity-" + productId).text(response.newQuantity);
+                        $("#total-" + productId).text("$" + parseFloat(response.newTotal).toFixed(2)); // ✅ Update Product Total
+                        $("#cart-total").text("$" + parseFloat(response.cartTotal).toFixed(2)); // ✅ Update Cart Total
+                    } else {
+                        alert(response.message); // Error handling
+                    }
+                },
+                error: function () {
+                    alert("Something went wrong! Please try again.");
+                }
+            });
+        });
+
+        // ✅ Remove Item from Cart
+        $(".remove-item").click(function () {
+            var productId = $(this).data("product-id");
+
+            if (confirm("Are you sure you want to remove this item?")) {
+                $.ajax({
+                    url: "/Product/RemoveFromCart",
+                    type: "POST",
+                    data: { productId: productId },
+                    success: function (response) {
+                        $("#row-" + productId).remove();
+                        $("#cart-total").text("$" + parseFloat(response.cartTotal).toFixed(2)); // ✅ Update Cart Total
+                    },
+                    error: function () {
+                        alert("Failed to remove item. Please try again.");
+                    }
+                });
+            }
+        });
+
+    });
+</script>
+
+
+
+@* @model List<SilkSareeEcommerce.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Your Shopping Cart";
+}
+
+<h2>Your Shopping Cart</h2>
+
+@if (Model != null && Model.Count > 0)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr id="row-@item.ProductId">
+                    <td>
+                        <img src="@item.Product.ImageUrl" alt="Product Image" style="width: 50px; height: 50px;" />
+                    </td>
+                    <td>@item.Product.Name</td>
+                    <td id="price-@item.ProductId">@item.Product.Price.ToString("C")</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger update-quantity" data-product-id="@item.ProductId" data-action="decrease">-</button>
+                        <span id="quantity-@item.ProductId">@item.Quantity</span>
+                        <button class="btn btn-sm btn-success update-quantity" data-product-id="@item.ProductId" data-action="increase">+</button>
+                    </td>
+                    <td id="total-@item.ProductId">@(item.Product.Price * item.Quantity)</td>
+                    <td>
+                        <button class="btn btn-danger remove-item" data-product-id="@item.ProductId">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Total Amount: <span id="cart-total">@Model.Sum(p => p.Product.Price * p.Quantity).ToString("C")</span></h4>
+
+    <a asp-action="Checkout" asp-controller="Product" class="btn btn-success">Proceed to Checkout</a>
+}
+else
+{
+    <p>Your cart is empty.</p>
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        // ✅ Increase/Decrease Quantity
+        $(".update-quantity").click(function () {
+            var productId = $(this).data("product-id");
+            var action = $(this).data("action");
+
+            $.ajax({
+                url: "/Product/UpdateCartQuantity",
+                type: "POST",
+                data: { productId: productId, action: action },
+                success: function (response) {
+                    if (response.success) {
+                        $("#quantity-" + productId).text(response.newQuantity);
+                        $("#total-" + productId).text(response.newTotal);   // ✅ Update Product Price
+                        $("#cart-total").text(response.cartTotal);          // ✅ Update Cart Total
+                    } else {
+                        alert(response.message); // Error handling
+                    }
+                },
+                error: function () {
+                    alert("Something went wrong! Please try again.");
+                }
+            });
+        });
+
+        // ✅ Remove Item from Cart
+        $(".remove-item").click(function () {
+            var productId = $(this).data("product-id");
+
+            if (confirm("Are you sure you want to remove this item?")) {
+                $.ajax({
+                    url: "/Product/RemoveFromCart",
+                    type: "POST",
+                    data: { productId: productId },
+                    success: function (response) {
+                        $("#row-" + productId).remove();
+                        $("#cart-total").text(response.cartTotal);
+                    },
+                    error: function () {
+                        alert("Failed to remove item. Please try again.");
+                    }
+                });
+            }
+        });
+
+    });
+</script>
+
+
+ *@
+@* @model List<SilkSareeEcommerce.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Your Shopping Cart";
+}
+
+<h2>Your Shopping Cart</h2>
+
+@if (Model != null && Model.Count > 0)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr id="row-@item.ProductId">
+                    <td>
+                        <img src="@item.Product.ImageUrl" alt="Product Image" style="width: 50px; height: 50px;" />
+                    </td>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Product.Price.ToString("C")</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger update-quantity" data-product-id="@item.ProductId" data-action="decrease">-</button>
+                        <span id="quantity-@item.ProductId">@item.Quantity</span>
+                        <button class="btn btn-sm btn-success update-quantity" data-product-id="@item.ProductId" data-action="increase">+</button>
+                    </td>
+                    <td id="total-@item.ProductId">@(item.Product.Price * item.Quantity)</td>
+                    <td>
+                        <button class="btn btn-danger remove-item" data-product-id="@item.ProductId">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Total Amount: <span id="cart-total">@Model.Sum(p => p.Product.Price * p.Quantity).ToString("C")</span></h4>
+
+    <a asp-action="Checkout" asp-controller="Product" class="btn btn-success">Proceed to Checkout</a>
+}
+else
+{
+    <p>Your cart is empty.</p>
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        // ✅ Increase/Decrease Quantity
+        $(".update-quantity").click(function () {
+            var productId = $(this).data("product-id");
+            var action = $(this).data("action");
+
+            $.ajax({
+                url: "/Product/UpdateCartQuantity",
+                type: "POST",
+                data: { productId: productId, action: action },
+                success: function (response) {
+                    if (response.newQuantity > 0) {
+                        $("#quantity-" + productId).text(response.newQuantity);
+                        $("#total-" + productId).text(response.newTotal);
+                        $("#cart-total").text(response.cartTotal);
+                    } else {
+                        $("#row-" + productId).remove(); // ✅ Remove if quantity = 0
+                        $("#cart-total").text(response.cartTotal);
+                    }
+                },
+                error: function () {
+                    alert("Something went wrong! Please try again.");
+                }
+            });
+        });
+
+        // ✅ Remove Item from Cart
+        $(".remove-item").click(function () {
+            var productId = $(this).data("product-id");
+
+            if (confirm("Are you sure you want to remove this item?")) {
+                $.ajax({
+                    url: "/Product/RemoveFromCart",
+                    type: "POST",
+                    data: { productId: productId },
+                    success: function (response) {
+                        $("#row-" + productId).remove();
+                        $("#cart-total").text(response.cartTotal);
+                    },
+                    error: function () {
+                        alert("Failed to remove item. Please try again.");
+                    }
+                });
+            }
+        });
+
+    });
+</script>
+
+ *@
+@* @model List<SilkSareeEcommerce.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Your Shopping Cart";
+}
+
+<h2>Your Shopping Cart</h2>
+
+@if (Model != null && Model.Count > 0)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="@item.Product.ImageUrl" alt="Product Image" style="width: 50px; height: 50px;" />
+                    </td>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Product.Price.ToString("C")</td>
+                    <td>@item.Quantity</td>
+                    <td>@(item.Product.Price * item.Quantity)</td>
+                    <td>
+                        <form asp-action="RemoveFromCart" asp-controller="Product" method="post">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Total Amount: @Model.Sum(p => p.Product.Price * p.Quantity).ToString("C")</h4>
+
+    <a asp-action="Checkout" asp-controller="Product" class="btn btn-success">Proceed to Checkout</a>
+}
+else
+{
+    <p>Your cart is empty.</p>
+}
+ *@

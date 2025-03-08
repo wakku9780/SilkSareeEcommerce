@@ -1,0 +1,87 @@
+﻿@model List<SilkSareeEcommerce.Models.Product>
+
+@{
+    ViewData["Title"] = "Products";
+    Layout = "_Layout"; // Ensure layout is set
+}
+
+<h2>All Products</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Product ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Category?.Name</td>
+                <td>@product.Price</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                    {
+                        <img src="@product.ImageUrl" alt="@product.Name" width="50" height="50" />
+                    }
+                    else
+                    {
+                        <span>No Image</span>
+                    }
+                </td>
+                <td>
+                    <a href="@Url.Action("Edit", "Product", new { id = product.Id })" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="@Url.Action("Delete", "Product", new { id = product.Id })" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@* @model List<SilkSareeEcommerce.Models.Product>
+
+@{
+    ViewData["Title"] = "Products";
+}
+<h2>All Products</h2>
+
+<table border="1">
+    <tr>
+        <th>Product ID</th>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Image</th>
+        <th>Actions</th>
+    </tr>
+    @foreach (var product in Model)
+    {
+        <tr>
+            <td>@product.Id</td>
+            <td>@product.Name</td>
+            <td>@product.Category?.Name</td>
+            <td>@product.Price</td>
+            <td>
+                @if (!string.IsNullOrEmpty(product.ImageUrl))
+                {
+                    <img src="@product.ImageUrl" alt="@product.Name" width="50" height="50" />
+                }
+                else
+                {
+                    <span>No Image</span>
+                }
+            <td>
+                <a href="@Url.Action("Edit", "Product", new { id = product.Id })">Edit</a> |
+                <a href="@Url.Action("Delete", "Product", new { id = product.Id })">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
+ *@

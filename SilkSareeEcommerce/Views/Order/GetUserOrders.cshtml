@@ -1,0 +1,28 @@
+﻿@model List<SilkSareeEcommerce.Models.Order>
+
+<h2>My Orders</h2>
+
+@if (Model != null && Model.Any())
+{
+    <table border="1">
+        <tr>
+            <th>Order ID</th>
+            <th>Order Date</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+        </tr>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                <td>@order.TotalAmount</td>
+                <td>@order.Status</td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <p>No orders found.</p>
+}

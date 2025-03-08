@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Make a Payment";
+}
+
+<h2>Make a Payment</h2>
+<p>Click the button below to proceed with PayPal payment.</p>
+
+<form method="post" asp-controller="Payment" asp-action="CreatePayment">
+    <label>Order ID:</label>
+    <input type="number" name="orderId" required />
+
+    <label>Amount:</label>
+    <input type="number" name="amount" step="0.01" required />
+
+    <button type="submit" class="btn btn-primary">Pay with PayPal</button>
+</form>

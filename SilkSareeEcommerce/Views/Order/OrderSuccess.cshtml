@@ -1,0 +1,12 @@
+﻿@{
+    ViewData["Title"] = "Order Success";
+}
+
+<div class="container mt-5">
+    <div class="alert alert-success text-center">
+        <h2>🎉 Order Placed Successfully!</h2>
+        <p>Your order has been placed successfully. Thank you for shopping with us!</p>
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Continue Shopping</a>
+        <a href="@Url.Action("GetUserOrders", "Order")" class="btn btn-secondary">View My Orders</a>
+    </div>
+</div>

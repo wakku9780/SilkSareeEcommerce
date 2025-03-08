@@ -14,10 +14,10 @@ namespace SilkSareeEcommerce.Services
             _paymentRepository = paymentRepository;
         }
 
-        public async Task<Payment> ProcessPaymentAsync(Payment payment)
-        {
-            payment.Status = "Completed"; // Razorpay ya PayPal ke response ke according update hoga
-            return await _paymentRepository.AddAsync(payment);
-        }
+        //public async Task<Payment> ProcessPaymentAsync(Payment payment)
+        //{
+        //    payment.Status = "Completed"; // Razorpay ya PayPal ke response ke according update hoga
+        //    return await _paymentRepository.AddAsync(payment);
+        //}
     }
 }

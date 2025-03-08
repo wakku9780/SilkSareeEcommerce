@@ -1,4 +1,100 @@
+/* Delete all previous footer-related styles and use only these */
+
 html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    margin-bottom: 60px; /* Height of the footer */
+}
+
+.wrapper {
+    min-height: calc(100vh - 60px); /* Viewport height minus footer height */
+    padding-bottom: 60px; /* Space for footer */
+}
+
+.content {
+    padding-bottom: 20px; /* Extra space before footer */
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px; /* Set footer height */
+    background-color: #343a40;
+    color: #ffffff;
+    text-align: center;
+    line-height: 60px; /* Center text vertically */
+}
+
+/* Ensure table and form content don't get hidden */
+.table-responsive, form {
+    margin-bottom: 80px;
+}
+
+/* Clear any floats */
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+/*html, body {
+    height: 100%;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;*/ /* Ensure karta hai ki pura viewport cover ho */
+/*}
+
+.content {
+    flex: 1;*/ /* Yeh ensure karega ki content expand ho sake */
+/*}
+
+.footer {
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 15px 0;
+    text-align: center;
+    width: 100%;
+    margin-top: 1000px;*/ /* Footer ko neeche fix karega bina overlap kiye */
+/*}*/
+
+
+/*html, body {
+    height: 100%;*/ /* Pure page ko full height par set karo */
+    /*margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;*/ /* Body ko flex column banaye */
+/*}
+
+.container {
+    flex: 1;*/ /* Container ko flex grow karne do */
+    /*overflow-y: auto;*/ /* Content scrollable banaye */
+/*}
+
+.footer {
+    flex-shrink: 0;*/ /* Footer ko shrink hone se roko */
+    /*background-color: #343a40;
+    color: #ffffff;
+    padding: 20px 0;
+    text-align: center;
+    position: sticky;*/ /* Footer ko sticky position par rakho */
+    /*bottom: 0;*/ /* Footer ko bottom par chipkaye */
+    /*width: 100%;*/ /* Footer ko full width par rakho */
+    /*z-index: 1000;*/ /* Footer ko content ke upar rakho */
+    
+/*}*/
+/*html {
   font-size: 14px;
 }
 
@@ -19,4 +115,4 @@ html {
 
 body {
   margin-bottom: 60px;
-}
+}*/

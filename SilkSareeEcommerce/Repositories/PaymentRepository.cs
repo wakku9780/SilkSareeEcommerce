@@ -1,5 +1,7 @@
 ﻿using SilkSareeEcommerce.Data;
 using SilkSareeEcommerce.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace SilkSareeEcommerce.Repositories
 {
@@ -12,16 +14,26 @@ namespace SilkSareeEcommerce.Repositories
             _context = context;
         }
 
-        public async Task<Payment> AddAsync(Payment payment)
+        public async Task<Payment> CreatePaymentAsync(Payment payment)
         {
             await _context.Payments.AddAsync(payment);
             await _context.SaveChangesAsync();
             return payment;
         }
 
-        public Task<Payment> AddAsync1(Payment payment)
+        public async Task<Payment> GetPaymentByTransactionIdAsync(string transactionId)
         {
-            throw new NotImplementedException();
+            return await _context.Payments.FirstOrDefaultAsync(p => p.TransactionId == transactionId);
+        }
+
+        public async Task UpdatePaymentStatusAsync(string transactionId, string status)
+        {
+            var payment = await GetPaymentByTransactionIdAsync(transactionId);
+            if (payment != null)
+            {
+                payment.Status = status;
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

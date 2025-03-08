@@ -16,6 +16,7 @@ namespace SilkSareeEcommerce.Data
         public DbSet<Wishlist> Wishlists { get; set; }    // ✅ Wishlist system ke liye
         public DbSet<Category> Categories { get; set; }  // ✅ Sarees ki categories store hongi
         public DbSet<Payment> Payments { get; set; }    // ✅ Payment transactions ke liye
+        public DbSet<Contact> Contacts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

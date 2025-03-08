@@ -1,55 +1,42 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SilkSareeEcommerce.Data;
-using SilkSareeEcommerce.Models;
+﻿using SilkSareeEcommerce.Models;
+using SilkSareeEcommerce.Repositories;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SilkSareeEcommerce.Services
 {
     public class CategoryService
     {
-
         private readonly ICategoryRepository _categoryRepository;
-        private readonly ApplicationDbContext _context;
 
-        public CategoryService(ICategoryRepository categoryRepository, ApplicationDbContext context)
+        public CategoryService(ICategoryRepository categoryRepository)
         {
             _categoryRepository = categoryRepository;
-            _context = context;
         }
 
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
         {
-            return await _categoryRepository.GetAllCategoriesAsync();
+            return await _categoryRepository.GetAllAsync();
         }
 
-        public async Task<Category> GetCategoryByIdAsync(int id)
+        public async Task<Category?> GetCategoryByIdAsync(int id)
         {
-            return await _categoryRepository.GetCategoryByIdAsync(id);
+            return await _categoryRepository.GetByIdAsync(id);
         }
 
-        public async Task<Category> AddCategoryAsync(Category category)
+        public async Task AddCategoryAsync(Category category)
         {
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-            return category;  // return the created category
+            await _categoryRepository.AddAsync(category);
         }
 
-
-        public async Task<Category> UpdateCategoryAsync(int id, Category category)
+        public async Task UpdateCategoryAsync(Category category)
         {
-            var existingCategory = await _context.Categories.FindAsync(id);
-            if (existingCategory == null)
-                return null;
-
-            existingCategory.Name = category.Name; // Update properties as needed
-            existingCategory.Description = category.Description;
-            await _context.SaveChangesAsync();
-            return existingCategory;
+            await _categoryRepository.UpdateAsync(category);
         }
-
 
         public async Task DeleteCategoryAsync(int id)
         {
-            await _categoryRepository.DeleteCategoryAsync(id);
+            await _categoryRepository.DeleteAsync(id);
         }
     }
 }

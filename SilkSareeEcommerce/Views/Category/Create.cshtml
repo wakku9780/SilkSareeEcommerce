@@ -1,0 +1,8 @@
+﻿@model SilkSareeEcommerce.Models.Category
+
+<h2>Add Category</h2>
+<form asp-action="Create">
+    <input asp-for="Name" placeholder="Category Name" required />
+    <input asp-for="Description" placeholder="Description" />
+    <button type="submit">Save</button>
+</form>

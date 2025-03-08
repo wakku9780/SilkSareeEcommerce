@@ -1,0 +1,27 @@
+﻿@model List<SilkSareeEcommerce.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Users";
+}
+<h2>All Users</h2>
+
+<table border="1">
+    <tr>
+        <th>User ID</th>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Actions</th>
+    </tr>
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Id</td>
+            <td>@user.FullName</td>
+            <td>@user.Email</td>
+            <td>
+                <a href="@Url.Action("Edit", "Admin", new { id = user.Id })">Edit</a> |
+                <a href="@Url.Action("Delete", "Admin", new { id = user.Id })">Delete</a>
+            </td>
+        </tr>
+    }
+</table>

@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SilkSareeEcommerce.Models;
 using SilkSareeEcommerce.Services;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SilkSareeEcommerce.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategoryController : Controller
     {
         private readonly CategoryService _categoryService;
 
@@ -17,47 +14,58 @@ namespace SilkSareeEcommerce.Controllers
             _categoryService = categoryService;
         }
 
-        // Get all categories
-        [HttpGet]
-        public async Task<IActionResult> GetCategories()
+        public async Task<IActionResult> Index()
         {
             var categories = await _categoryService.GetAllCategoriesAsync();
-            return Ok(categories);
+            return View(categories);
         }
 
-        // Add a new category
+        public IActionResult Create()
+        {
+            return View();
+        }
+
         [HttpPost]
-        public async Task<IActionResult> AddCategory([FromBody] Category category)
+        public async Task<IActionResult> Create(Category category)
         {
-            if (category == null)
-                return BadRequest("Invalid category data");
-
-            var result = await _categoryService.AddCategoryAsync(category);
-            return Ok(result); // Now result is a Category object
+            if (ModelState.IsValid)
+            {
+                await _categoryService.AddCategoryAsync(category);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(category);
         }
 
-
-        // Update category
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] Category category)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (category == null)
-                return BadRequest("Invalid category data");
-
-            var updatedCategory = await _categoryService.UpdateCategoryAsync(id, category);
-            if (updatedCategory == null)
-                return NotFound("Category not found");
-
-            return Ok(updatedCategory);
+            var category = await _categoryService.GetCategoryByIdAsync(id);
+            if (category == null) return NotFound();
+            return View(category);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Edit(Category category)
+        {
+            if (ModelState.IsValid)
+            {
+                await _categoryService.UpdateCategoryAsync(category);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(category);
+        }
 
-        // Delete category
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(int id)
+        public async Task<IActionResult> Delete(int id)
+        {
+            var category = await _categoryService.GetCategoryByIdAsync(id);
+            if (category == null) return NotFound();
+            return View(category);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _categoryService.DeleteCategoryAsync(id);
-            return Ok("Category deleted successfully");
+            return RedirectToAction(nameof(Index));
         }
     }
 }

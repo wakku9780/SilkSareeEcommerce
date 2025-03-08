@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "My Orders";
+}
+
+<h2>Order Dashboard</h2>
+
+<ul>
+    <h2>Order Dashboard</h2>
+
+    <form method="post" action="@Url.Action("PlaceOrder", "Order")">
+        <button type="submit">Place New Order</button>
+    </form>
+
+    <li><a href="@Url.Action("OrderSuccess", "Order")">Order Success Page</a></li>
+    <li><a href="@Url.Action("GetUserOrders", "Order")">View My Orders</a></li>
+    <li><a href="@Url.Action("GetAllOrders", "Order")">View All Orders (Admin)</a></li>
+</ul>
+
+<p><a href="@Url.Action("Index", "Home")">Back to Home</a></p>

@@ -1,0 +1,22 @@
+﻿@model SilkSareeEcommerce.Models.Product
+
+@{
+    ViewData["Title"] = "Buy Now";
+}
+
+<div class="container">
+    <h2>Buy Now - @Model.Name</h2>
+
+    <div class="card">
+        <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name">
+        <div class="card-body">
+            <h5 class="card-title">@Model.Name</h5>
+            <p class="card-text">@Model.Description</p>
+            <h4>Price: ₹@Model.Price</h4>
+            <form method="post" asp-action="PlaceOrder" asp-controller="Order">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <button type="submit" class="btn btn-primary">Place Order</button>
+            </form>
+        </div>
+    </div>
+</div>

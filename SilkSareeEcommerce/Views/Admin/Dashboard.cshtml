@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center">
+            <h2>Admin Dashboard</h2>
+            <p class="mb-0">Welcome to the Admin Panel!</p>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <a href="@Url.Action("Orders", "Admin")" class="btn btn-outline-primary w-100 py-3 shadow-sm">
+                        <i class="fas fa-shopping-cart"></i> Manage Orders
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("Products", "Admin")" class="btn btn-outline-success w-100 py-3 shadow-sm">
+                        <i class="fas fa-box-open"></i> Manage Products
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="@Url.Action("Users", "Admin")" class="btn btn-outline-danger w-100 py-3 shadow-sm">
+                        <i class="fas fa-users"></i> Manage Users
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap & Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
