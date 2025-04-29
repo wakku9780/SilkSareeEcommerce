@@ -88,6 +88,7 @@ namespace SilkSareeEcommerce.Controllers
                 {
                     return RedirectToAction("Index", "Home");
                 }
+                TempData["ErrorMessage"] = "Invalid email or password!";
                 ModelState.AddModelError("", "Invalid login attempt.");
             }
             return View(model);

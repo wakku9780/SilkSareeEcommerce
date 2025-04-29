@@ -84,6 +84,44 @@ namespace SilkSareeEcommerce.Services
         //    return await _orderRepository.CreateOrderAsync(order);
         //}
 
+
+
+
+        public async Task<Order> CreateOrderFromBuyNowAsync(string userId, Product product, int quantity, string paymentMethod)
+        {
+            if (product.Quantity < quantity)
+            {
+                return null;
+            }
+
+            var order = new Order
+            {
+                UserId = userId,
+                OrderDate = DateTime.Now,
+                PaymentMethod = paymentMethod,
+                TotalAmount = product.Price * quantity,
+                Status = "Pending",
+                OrderItems = new List<OrderItem>
+        {
+            new OrderItem
+            {
+                ProductId = product.Id,
+                Quantity = quantity,
+                Price = product.Price
+            }
+        }
+            };
+
+            // Reduce stock
+            
+
+            
+            return await _orderRepository.CreateOrderAsync(order);
+        }
+
+
+
+
         public async Task ConfirmOrderAsync(string userId, IEnumerable<CartItem> cartItems)
         {
            // var order = await CreateOrderAsync(userId,   cartItems.ToList());

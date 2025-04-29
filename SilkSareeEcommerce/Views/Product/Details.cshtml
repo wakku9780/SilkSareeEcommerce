@@ -15,9 +15,23 @@
             <a asp-action="Index" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Products
             </a>
-            <a asp-action="AddToCart" asp-route-id="@Model.Id" class="btn btn-primary">
-                <i class="fas fa-shopping-cart"></i> Add to Cart
-            </a>
+      @*       <form asp-controller="Product" asp-action="AddToCart" method="post" class="d-inline">
+                <input type="hidden" name="productId" value="" />
+                <input type="hidden" name="quantity" value="1" />
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+            </form> *@
+
+            <form asp-controller="Product" asp-action="AddToCart" method="post" class="d-inline">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <input type="hidden" name="quantity" value="1" />
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+            </form>
+
+
             <a asp-action="BuyNow" asp-route-id="@Model.Id" class="btn btn-success">
                 <i class="fas fa-bolt"></i> Buy Now
             </a>

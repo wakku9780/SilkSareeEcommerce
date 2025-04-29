@@ -40,10 +40,11 @@ namespace SilkSareeEcommerce.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveFromCartAsync(string userId, int productId)
+
+        public async Task RemoveFromCartAsync(string userId, int cartItemId)
         {
             var cartItem = await _context.CartItems
-                .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.Id == cartItemId);
 
             if (cartItem != null)
             {
@@ -51,6 +52,19 @@ namespace SilkSareeEcommerce.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+
+        //public async Task RemoveFromCartAsync(string userId, int productId)
+        //{
+        //    var cartItem = await _context.CartItems
+        //        .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
+
+        //    if (cartItem != null)
+        //    {
+        //        _context.CartItems.Remove(cartItem);
+        //        await _context.SaveChangesAsync();
+        //    }
+        //}
 
         public async Task ClearCartAsync(string userId)
         {

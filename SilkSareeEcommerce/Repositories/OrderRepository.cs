@@ -48,12 +48,53 @@ namespace SilkSareeEcommerce.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<Order> CreateOrderAsync(Order order)
+
+        public async Task<Order?> CreateOrderAsync(Order order)
         {
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-            return order;
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    var product = await _context.Products
+                        .Where(p => p.Id == item.ProductId)
+                        .FirstOrDefaultAsync();
+
+                    if (product == null)
+                    {
+                        await transaction.RollbackAsync();
+                        return null; // Product not found
+                    }
+
+                    if (product.Quantity < item.Quantity)
+                    {
+                        await transaction.RollbackAsync();
+                        return null; // Stock insufficient
+                    }
+
+                    product.Quantity -= item.Quantity;
+                    _context.Products.Update(product);
+                }
+
+                _context.Orders.Add(order);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return order;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return null;
+            }
         }
+
+        //public async Task<Order> CreateOrderAsync(Order order)
+        //{
+        //    _context.Orders.Add(order);
+        //    await _context.SaveChangesAsync();
+        //    return order;
+        //}
 
     }
 

@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using SilkSareeEcommerce.Services;
 using Microsoft.AspNetCore.Authorization;
+using SilkSareeEcommerce.Models;
 
 namespace SilkSareeEcommerce.Controllers
 {
@@ -10,11 +11,13 @@ namespace SilkSareeEcommerce.Controllers
     {
         private readonly OrderService _orderService;
         private readonly CartService _cartService;
+        private readonly ProductService _productService;
 
-        public OrderController(OrderService orderService, CartService cartService)
+        public OrderController(OrderService orderService, CartService cartService,ProductService productService)
         {
             _orderService = orderService;
             _cartService = cartService;
+            _productService = productService;
         }
         [HttpGet]
         public IActionResult Index()
@@ -59,8 +62,8 @@ namespace SilkSareeEcommerce.Controllers
 
                 if (order == null)
                 {
-                    TempData["Error"] = "Failed to place order!";
-                    return RedirectToAction("Checkout", "Product");
+                    TempData["Error"] = "Failed to place order! due to out of stock";
+                    return RedirectToAction("Checkout", "Order");
                 }
 
                 // ✅ Order placed successfully, now clear the cart
@@ -76,8 +79,63 @@ namespace SilkSareeEcommerce.Controllers
             }
 
             TempData["Error"] = "Invalid Payment Method!";
-            return RedirectToAction("Checkout", "Product");
+            return RedirectToAction("Checkout", "Order");
         }
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> PlaceOrderFromBuyNow(BuyNowViewModel model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var product = await _productService.GetProductByIdAsync(model.Product.Id);
+            if (product == null)
+            {
+                TempData["Error"] = "Product not found!";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (product.Quantity < model.Quantity)
+            {
+                TempData["Error"] = "Product is out of stock!";
+                return RedirectToAction("BuyNow", "Product", new { id = model.Product.Id });
+            }
+
+            if (model.PaymentMethod == "COD")
+            {
+                var order = await _orderService.CreateOrderFromBuyNowAsync(userId, product, model.Quantity, "COD");
+
+                if (order == null)
+                {
+                    TempData["Error"] = "Failed to place order!";
+                    return RedirectToAction("BuyNow", "Product", new { id = model.Product.Id });
+                }
+
+                TempData["Success"] = "Your order has been placed successfully!";
+                return RedirectToAction("OrderSuccess");
+            }
+            else if (model.PaymentMethod == "PayPal")
+            {
+                TempData["BuyNow_ProductId"] = model.Product.Id;
+                TempData["BuyNow_Quantity"] = model.Quantity;
+                return RedirectToAction("PayWithPayPal", "Payment");
+            }
+
+            TempData["Error"] = "Invalid payment method!";
+            return RedirectToAction("BuyNow", "Product", new { id = model.Product.Id });
+        }
+
+
+
+
+
+
 
 
 
@@ -86,6 +144,37 @@ namespace SilkSareeEcommerce.Controllers
         {
             TempData["Success"] = "Your order has been placed successfully!";
             return RedirectToAction("Index", "Home"); // Ya koi aur action
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> Checkout()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+
+            var checkoutViewModel = new CheckoutViewModel
+            {
+                CartItems = cartItems.ToList(),
+                TotalAmount = cartItems.Sum(item => item.Quantity * item.Product.Price),
+                PaymentMethod = "COD" // Default Payment Method
+            };
+
+            return View(checkoutViewModel);
+
+            //if (cartItems == null || !cartItems.Any())
+            //{
+            //    TempData["Error"] = "Your cart is empty!";
+            //    return RedirectToAction(nameof(ViewCart));
+            //}
+
+            //return View(cartItems); // ✅ Ye checkout page pe cart items bhejega
         }
 
     }

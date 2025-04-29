@@ -38,7 +38,7 @@ namespace SilkSareeEcommerce.Controllers
         public async Task<IActionResult> Create()
         {
             ViewBag.Categories = new SelectList(await _categoryService.GetAllCategoriesAsync(), "Id", "Name");
-            return View();
+            return View("crea");
         }
 
         [Authorize(Roles = "Admin")]
@@ -261,17 +261,39 @@ namespace SilkSareeEcommerce.Controllers
             //return View(cartItems); // ✅ Ye checkout page pe cart items bhejega
         }
 
+
         [HttpGet("BuyNow/{id}")]
         public async Task<IActionResult> BuyNow(int id)
         {
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null)
             {
-                return NotFound(); // 404 Error agar product nahi mila
+                return NotFound(); // Agar product nahi mila
             }
 
-            return View("BuyNow", product);
+            // BuyNowViewModel create karo aur product ko set karo
+            var model = new BuyNowViewModel
+            {
+                Product = product
+            };
+
+            return View("BuyNow", model);  // Model ko pass karo
         }
+
+
+
+        //[HttpGet("BuyNow/{id}")]
+        //public async Task<IActionResult> BuyNow(int id)
+        //{
+        //    var product = await _productService.GetProductByIdAsync(id);
+        //    if (product == null)
+        //    {
+        //        return NotFound(); // 404 Error agar product nahi mila
+        //    }
+
+        //    return View("BuyNow", product);
+        //   // return RedirectToAction(nameof(ViewCart));
+        //}
 
         [HttpPost]
         public async Task<IActionResult> PlaceOrder(string PaymentMethod)

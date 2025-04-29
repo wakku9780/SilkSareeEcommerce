@@ -1,13 +1,13 @@
 ﻿@model SilkSareeEcommerce.Models.CheckoutViewModel
 
-<h2>Checkout</h2>
+<h2>Checkout Order</h2>
 
-@if (TempData["Error"] != null)
+@* @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger">
         @TempData["Error"]
     </div>
-}
+} *@
 
 <table class="table">
     <thead>
@@ -44,42 +44,3 @@
 
     <button type="submit" class="btn btn-primary">Place Order</button>
 </form>
-
-
-@* @model List<SilkSareeEcommerce.Models.CartItem>
-
-
-<h2>Checkout</h2>
-
-@if (Model.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Product.Name</td>
-                    <td>@item.Quantity</td>
-                    <td>@item.Product.Price</td>
-                    <td>@(item.Quantity * item.Product.Price)</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <form asp-controller="Order" asp-action="PlaceOrder" method="post">
-        <button type="submit" class="btn btn-primary">Place Order</button>
-    </form>
-}
-else
-{
-    <p>Your cart is empty.</p>
-}
- *@

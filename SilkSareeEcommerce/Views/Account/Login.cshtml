@@ -4,11 +4,23 @@
     ViewData["Title"] = "Login";
 }
 
+@{
+    var errorMessage = TempData["ErrorMessage"] as string;
+}
+
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh; padding-top: 60px;">
     <div class="card shadow-lg p-4" style="width: 400px; border-radius: 15px;">
         <div class="text-center">
             <h2 class="mb-4 text-primary fw-bold">Login</h2>
         </div>
+
+        <!-- 🔴 Error Alert -->
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger text-center fw-semibold" role="alert">
+                @errorMessage
+            </div>
+        }
 
         <form asp-action="Login" method="post">
             <div class="mb-3">

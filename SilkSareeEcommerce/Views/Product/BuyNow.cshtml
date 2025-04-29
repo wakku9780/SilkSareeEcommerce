@@ -1,4 +1,86 @@
-﻿@model SilkSareeEcommerce.Models.Product
+﻿@model SilkSareeEcommerce.Models.BuyNowViewModel
+
+@{
+    ViewData["Title"] = "Buy Now";
+}
+
+<h2>Buy Now</h2>
+
+<form method="post" asp-action="PlaceOrderFromBuyNow" asp-controller="Order">
+    <input type="hidden" name="Product.Id" value="@Model.Product.Id" />
+
+    <div class="form-group">
+        <label>Quantity</label>
+        <input asp-for="Quantity" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Select Payment Method:</label>
+        <select asp-for="PaymentMethod" class="form-control">
+            <option value="COD">Cash on Delivery</option>
+            <option value="PayPal">PayPal</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Place Order</button>
+</form>
+
+
+
+
+
+
+
+
+
+@* @model SilkSareeEcommerce.Models.BuyNowViewModel
+
+@{
+    ViewData["Title"] = "Buy Now";
+}
+
+<div class="container">
+    <h2>Buy Now - @Model.Product.Name</h2>
+
+    <div class="card">
+        <img src="@Model.Product.ImageUrl" class="card-img-top" alt="@Model.Product.Name">
+        <div class="card-body">
+            <h5 class="card-title">@Model.Product.Name</h5>
+            <p class="card-text">@Model.Product.Description</p>
+            <h4>Price: ₹@Model.Product.Price</h4>
+
+            <form method="post" asp-action="PlaceOrder" asp-controller="Order">
+                <input type="hidden" name="productId" value="@Model.Product.Id" />
+                <input type="hidden" name="price" value="@Model.Product.Price" />
+
+                <div class="form-group">
+                    <label>Quantity:</label>
+                    <input type="number" name="quantity" value="@Model.Quantity" class="form-control" min="1" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Select Payment Method:</label>
+                    <select name="paymentMethod" class="form-control" required>
+                        <option value="COD">Cash on Delivery</option>
+                        <option value="PayPal">Pay with PayPal</option>
+                        <option value="Razorpay">Pay with Razorpay</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Place Order</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+ *@
+
+
+
+
+
+
+@* @model SilkSareeEcommerce.Models.Product
 
 @{
     ViewData["Title"] = "Buy Now";
@@ -20,3 +102,4 @@
         </div>
     </div>
 </div>
+ *@

@@ -27,5 +27,15 @@ namespace SilkSareeEcommerce.Models
         // Navigation Property
         [BindNever]  // Yeh property form se bind nahi hogi
         public Category Category { get; set; }
+
+
+        [Required(ErrorMessage = "Stock is required")]
+        [Range(0, 10000, ErrorMessage = "Stock must be between 0 and 10000")]
+        public int Quantity { get; set; }
+
+
+
+        [Timestamp]
+        public byte[] RowVersion { get; set; } // ⚠️ This is important
     }
 }
