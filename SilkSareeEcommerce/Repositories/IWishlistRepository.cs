@@ -10,5 +10,9 @@ namespace SilkSareeEcommerce.Repositories
         Task AddToWishlistAsync(Wishlist wishlist);
         Task RemoveFromWishlistAsync(int wishlistId);
         Task<bool> IsProductInWishlistAsync(string userId, int productId);
+
+        Task ClearWishlistByUserIdAsync(string userId);
+
+        Task<Wishlist> GetByIdAsync(int wishlistId);
     }
 }

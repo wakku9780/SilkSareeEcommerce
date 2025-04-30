@@ -44,5 +44,27 @@ namespace SilkSareeEcommerce.Repositories
         {
             return await _context.Wishlists.AnyAsync(w => w.UserId == userId && w.ProductId == productId);
         }
+
+
+        public async Task ClearWishlistByUserIdAsync(string userId)
+        {
+            var wishlistItems = await _context.Wishlists
+                .Where(w => w.UserId == userId)
+                .ToListAsync();
+
+            _context.Wishlists.RemoveRange(wishlistItems);
+            await _context.SaveChangesAsync();
+        }
+
+
+        public async Task<Wishlist> GetByIdAsync(int wishlistId)
+        {
+            return await _context.Wishlists
+                                 .Include(w => w.Product)  // Agar Product bhi include karna hai
+                                 .FirstOrDefaultAsync(w => w.Id == wishlistId);
+        }
+
+
+
     }
 }

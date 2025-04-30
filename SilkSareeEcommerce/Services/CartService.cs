@@ -26,6 +26,32 @@ namespace SilkSareeEcommerce.Services
 
 
 
+        public async Task<bool> AddToCartAsync(string userId, int productId)
+        {
+            // Check if item already exists in cart
+            var existingCartItem = await _cartRepository.GetCartItemByUserIdAndProductIdAsync(userId, productId);
+            if (existingCartItem != null)
+            {
+                return false; // Item already in cart
+            }
+
+            // Create new cart item
+            var cartItem = new CartItem
+            {
+                UserId = userId,
+                ProductId = productId,
+                Quantity = 1, // Default quantity
+            };
+
+            // Add to cart repository
+            await _cartRepository.AddToCartAsync(userId,productId,cartItem.Quantity);
+
+            return true;
+        }
+
+
+
+
         public async Task AddToCartAsync(string userId, int productId, int quantity)
         {
             await _cartRepository.AddToCartAsync(userId, productId, quantity);

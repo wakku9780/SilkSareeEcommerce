@@ -107,6 +107,15 @@ namespace SilkSareeEcommerce.Repositories
 
 
 
+
+        public async Task<CartItem> GetCartItemByUserIdAndProductIdAsync(string userId, int productId)
+        {
+            return await _context.CartItems
+                                 .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
+        }
+
+
+
     }
 
 }

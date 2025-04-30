@@ -39,5 +39,20 @@ namespace SilkSareeEcommerce.Services
         {
             await _wishlistRepository.RemoveFromWishlistAsync(wishlistId);
         }
+
+        public async Task ClearWishlistAsync(string userId)
+        {
+            await _wishlistRepository.ClearWishlistByUserIdAsync(userId);
+        }
+
+        // Yeh method wishlist mein item get karne ke liye
+        public async Task<Wishlist> GetWishlistItemByIdAsync(int wishlistId)
+        {
+            return await _wishlistRepository.GetByIdAsync(wishlistId);
+        }
+
+
+         
+
     }
 }
