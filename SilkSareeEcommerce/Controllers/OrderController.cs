@@ -13,11 +13,15 @@ namespace SilkSareeEcommerce.Controllers
         private readonly CartService _cartService;
         private readonly ProductService _productService;
 
-        public OrderController(OrderService orderService, CartService cartService,ProductService productService)
+
+        private readonly UserService _userService;
+
+        public OrderController(OrderService orderService, CartService cartService, ProductService productService, UserService userService)
         {
             _orderService = orderService;
             _cartService = cartService;
             _productService = productService;
+            _userService = userService;
         }
         [HttpGet]
         public IActionResult Index()
@@ -133,6 +137,56 @@ namespace SilkSareeEcommerce.Controllers
 
 
 
+        [HttpPost]
+        public async Task<IActionResult> PlaceOrderWithAddress(string PaymentMethod, string ShippingAddress, bool SaveAddress)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+            if (cartItems == null || !cartItems.Any())
+            {
+                TempData["Error"] = "Your cart is empty!";
+                return RedirectToAction("ViewCart", "Product");
+            }
+
+            // ✅ Save the shipping address if requested
+            if (SaveAddress && !string.IsNullOrWhiteSpace(ShippingAddress))
+            {
+                await _userService.SaveAddressAsync(userId, ShippingAddress);
+            }
+
+            if (PaymentMethod == "COD")
+            {
+                // ✅ Place order with Cash on Delivery
+                var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD");
+
+                if (order == null)
+                {
+                    TempData["Error"] = "Failed to place order! due to out of stock";
+                    return RedirectToAction("Checkout", "Order");
+                }
+
+                await _cartService.ClearCartAsync(userId);
+
+                TempData["Success"] = "Your order has been placed successfully with Cash on Delivery!";
+                return RedirectToAction("OrderSuccess");
+            }
+            else if (PaymentMethod == "PayPal")
+            {
+                // ✅ Store shipping address temporarily if needed
+                TempData["ShippingAddress"] = ShippingAddress;
+
+                // ✅ Redirect to PayPal Payment Page
+                return RedirectToAction("PayWithPayPal", "Payment");
+            }
+
+            TempData["Error"] = "Invalid Payment Method!";
+            return RedirectToAction("Checkout", "Order");
+        }
 
 
 
@@ -147,35 +201,55 @@ namespace SilkSareeEcommerce.Controllers
         }
 
 
-
         [HttpGet]
         public async Task<IActionResult> Checkout()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
             var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+            var savedAddress = await _userService.GetAddressAsync(userId);
 
             var checkoutViewModel = new CheckoutViewModel
             {
-                CartItems = cartItems.ToList(),
-                TotalAmount = cartItems.Sum(item => item.Quantity * item.Product.Price),
-                PaymentMethod = "COD" // Default Payment Method
+                CartItems = cartItems,
+                TotalAmount = cartItems.Sum(i => i.Quantity * i.Product.Price),
+                PaymentMethod = "COD",
+                ShippingAddress = savedAddress
             };
 
             return View(checkoutViewModel);
-
-            //if (cartItems == null || !cartItems.Any())
-            //{
-            //    TempData["Error"] = "Your cart is empty!";
-            //    return RedirectToAction(nameof(ViewCart));
-            //}
-
-            //return View(cartItems); // ✅ Ye checkout page pe cart items bhejega
         }
+
+
+        //[HttpGet]
+        //public async Task<IActionResult> Checkout()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+
+        //    var checkoutViewModel = new CheckoutViewModel
+        //    {
+        //        CartItems = cartItems.ToList(),
+        //        TotalAmount = cartItems.Sum(item => item.Quantity * item.Product.Price),
+        //        PaymentMethod = "COD" // Default Payment Method
+        //    };
+
+        //    return View(checkoutViewModel);
+
+        //    //if (cartItems == null || !cartItems.Any())
+        //    //{
+        //    //    TempData["Error"] = "Your cart is empty!";
+        //    //    return RedirectToAction(nameof(ViewCart));
+        //    //}
+
+        //    //return View(cartItems); // ✅ Ye checkout page pe cart items bhejega
+        //}
 
     }
 }

@@ -33,6 +33,31 @@ namespace SilkSareeEcommerce.Repositories
             return user;
         }
 
+        public async Task<string> GetAddressAsync(string userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            return user?.Address;
+        }
+
+        public async Task SaveAddressAsync(string userId, string address)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                user.Address = address;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<string>> GetSavedAddressesByUserIdAsync(string userId)
+        {
+            return await _context.SavedAddresses
+                .Where(a => a.UserId == userId)
+                .Select(a => a.Address)
+                .ToListAsync();
+        }
+
+
         // Add any other necessary methods.
     }
 }

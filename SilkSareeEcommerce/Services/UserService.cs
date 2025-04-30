@@ -1,16 +1,19 @@
 ﻿using SilkSareeEcommerce.Models;
 using Microsoft.EntityFrameworkCore;
 using SilkSareeEcommerce.Data;
+using SilkSareeEcommerce.Repositories;
 
 namespace SilkSareeEcommerce.Services
 {
     public class UserService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(ApplicationDbContext context)
+        public UserService(ApplicationDbContext context, IUserRepository userRepository)
         {
             _context = context;
+            _userRepository = userRepository;
         }
 
         public async Task<List<ApplicationUser>> GetAllUsersAsync()
@@ -32,5 +35,24 @@ namespace SilkSareeEcommerce.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+
+        public Task<string> GetAddressAsync(string userId)
+        {
+            return _userRepository.GetAddressAsync(userId);
+        }
+
+        public Task SaveAddressAsync(string userId, string address)
+        {
+            return _userRepository.SaveAddressAsync(userId, address);
+        }
+
+        public async Task<List<string>> GetSavedAddressesAsync(string userId)
+        {
+            return await _userRepository.GetSavedAddressesByUserIdAsync(userId);
+        }
+
+        
+
     }
 }

@@ -18,8 +18,9 @@ namespace SilkSareeEcommerce.Controllers
 
         private readonly PayPalService _payPalService;
         private readonly OrderService _orderService;
+        private readonly UserService _userService;
 
-        public ProductController(OrderService orderService, PayPalService payPalService,ProductService productService, CategoryService categoryService, CloudinaryService cloudinaryService, CartService cartService)
+        public ProductController(OrderService orderService, PayPalService payPalService,ProductService productService, CategoryService categoryService, CloudinaryService cloudinaryService, CartService cartService, UserService userService)
         {
             _productService = productService;
             _categoryService = categoryService;
@@ -27,6 +28,7 @@ namespace SilkSareeEcommerce.Controllers
             _cartService = cartService; // ✅ Injecting CartService
             _payPalService = payPalService;
             _orderService = orderService;
+            _userService = userService;
         }
 
         public async Task<IActionResult> Index()
@@ -232,34 +234,86 @@ namespace SilkSareeEcommerce.Controllers
             });
         }
 
+
         [HttpGet]
         public async Task<IActionResult> Checkout()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
             var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
 
+            var totalAmount = cartItems.Sum(item => item.Product.Price * item.Quantity);
+            var savedAddresses = await _userService.GetSavedAddressesAsync(userId);
+
             var checkoutViewModel = new CheckoutViewModel
             {
-                CartItems = cartItems.ToList(),
-                TotalAmount = cartItems.Sum(item => item.Quantity * item.Product.Price),
-                PaymentMethod = "COD" // Default Payment Method
+                CartItems = cartItems,
+                TotalAmount = totalAmount,
+                SavedAddresses = savedAddresses
             };
 
+
+           
+
             return View(checkoutViewModel);
-
-            //if (cartItems == null || !cartItems.Any())
-            //{
-            //    TempData["Error"] = "Your cart is empty!";
-            //    return RedirectToAction(nameof(ViewCart));
-            //}
-
-            //return View(cartItems); // ✅ Ye checkout page pe cart items bhejega
         }
+
+
+
+
+
+
+
+
+        //[HttpGet]
+        //public async Task<IActionResult> Checkout()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        //    var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+        //    var savedAddress = await _userService.GetAddressAsync(userId);
+
+        //    var checkoutViewModel = new CheckoutViewModel
+        //    {
+        //        CartItems = cartItems,
+        //        TotalAmount = cartItems.Sum(i => i.Quantity * i.Product.Price),
+        //        PaymentMethod = "COD",
+        //        ShippingAddress = savedAddress
+        //    };
+
+        //    return View(checkoutViewModel);
+        //}
+
+        //[HttpGet]
+        //public async Task<IActionResult> Checkout()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+
+        //    var checkoutViewModel = new CheckoutViewModel
+        //    {
+        //        CartItems = cartItems.ToList(),
+        //        TotalAmount = cartItems.Sum(item => item.Quantity * item.Product.Price),
+        //        PaymentMethod = "COD" // Default Payment Method
+        //    };
+
+        //    return View(checkoutViewModel);
+
+        //    //if (cartItems == null || !cartItems.Any())
+        //    //{
+        //    //    TempData["Error"] = "Your cart is empty!";
+        //    //    return RedirectToAction(nameof(ViewCart));
+        //    //}
+
+        //    //return View(cartItems); // ✅ Ye checkout page pe cart items bhejega
+        //}
 
 
         [HttpGet("BuyNow/{id}")]

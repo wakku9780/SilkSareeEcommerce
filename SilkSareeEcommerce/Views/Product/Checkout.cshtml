@@ -33,20 +33,186 @@
 
 <h4>Total: @Model.TotalAmount.ToString("C")</h4>
 
-<form asp-controller="Order" asp-action="PlaceOrder" method="post">
+<form asp-controller="Order" asp-action="PlaceOrderWithAddress" method="post">
     <div class="form-group">
         <label>Select Payment Method:</label>
         <select asp-for="PaymentMethod" class="form-control" required>
             <option value="COD">Cash on Delivery</option>
             <option value="PayPal">Pay with PayPal</option>
         </select>
-        <h4>Shipping Address</h4>
-        <input type="text" name="ShippingAddress" placeholder="Enter Shipping Address" class="form-control" required />
-
     </div>
 
-    <button type="submit" class="btn btn-primary">Place Order</button>
+    @* Show existing address if available *@
+    @if (!string.IsNullOrEmpty(Model.ExistingAddress))
+    {
+        <div class="alert alert-info">
+            <strong>Saved Address:</strong> @Model.ExistingAddress
+        </div>
+    }
+
+    @* Saved Addresses Dropdown *@
+    @if (Model.SavedAddresses != null && Model.SavedAddresses.Any())
+    {
+        <div class="form-group">
+            <label>Select from Saved Addresses:</label>
+            <select id="savedAddressDropdown" class="form-control">
+                <option value="">-- Select an address --</option>
+                @foreach (var address in Model.SavedAddresses)
+                {
+                    <option value="@address">@address</option>
+                }
+            </select>
+        </div>
+    }
+
+    <div class="form-group">
+        <label>Enter New Shipping Address:</label>
+        <input asp-for="ShippingAddress" class="form-control" placeholder="Enter Shipping Address" />
+    </div>
+
+    <div class="form-check">
+        <input asp-for="SaveAddress" class="form-check-input" id="saveAddressCheck" />
+        <label class="form-check-label" for="saveAddressCheck">Save this address for future orders</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Place Order</button>
 </form>
+
+<script>
+    document.getElementById('savedAddressDropdown')?.addEventListener('change', function () {
+        document.getElementById('shippingAddressInput').value = this.value;
+    });
+</script>
+
+
+
+
+@* @model SilkSareeEcommerce.Models.CheckoutViewModel
+
+<h2>Checkout Product</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.CartItems)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Product.Price.ToString("C")</td>
+                <td>@(item.Quantity * item.Product.Price)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Total: @Model.TotalAmount.ToString("C")</h4>
+
+<form asp-controller="Order" asp-action="PlaceOrderWithAddress" method="post">
+    <div class="form-group">
+        <label>Select Payment Method:</label>
+        <select asp-for="PaymentMethod" class="form-control" required>
+            <option value="COD">Cash on Delivery</option>
+            <option value="PayPal">Pay with PayPal</option>
+        </select>
+    </div>
+
+    @* ✅ Show existing address if available *@
+   @*  @if (!string.IsNullOrEmpty(Model.ExistingAddress))
+    {
+        <div class="alert alert-info">
+            <strong>Saved Address:</strong> @Model.ExistingAddress
+        </div>
+    }
+
+    <div class="form-group">
+        <label>Enter New Shipping Address:</label>
+        <input asp-for="ShippingAddress" class="form-control" placeholder="Enter Shipping Address" />
+    </div>
+
+    <div class="form-check">
+        <input asp-for="SaveAddress" class="form-check-input" id="saveAddressCheck" />
+        <label class="form-check-label" for="saveAddressCheck">Save this address for future orders</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Place Order</button>
+</form>
+
+
+ *@ 
+
+
+
+@* @model SilkSareeEcommerce.Models.CheckoutViewModel
+
+<h2>Checkout Product</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.CartItems)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Product.Price.ToString("C")</td>
+                <td>@(item.Quantity * item.Product.Price)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Total: @Model.TotalAmount.ToString("C")</h4>
+
+<form asp-controller="Order" asp-action="PlaceOrderWithAddress" method="post">
+    <div class="form-group">
+        <label>Select Payment Method:</label>
+        <select name="PaymentMethod" class="form-control" required>
+            <option value="COD">Cash on Delivery</option>
+            <option value="PayPal">Pay with PayPal</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Shipping Address:</label>
+        <input type="text" name="ShippingAddress" placeholder="Enter Shipping Address" class="form-control" required />
+    </div>
+
+    <div class="form-check">
+        <input type="checkbox" name="SaveAddress" value="true" class="form-check-input" id="saveAddressCheck" />
+        <label class="form-check-label" for="saveAddressCheck">Save this address for future orders</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Place Order</button>
+</form> *@
 
 
 @* @model List<SilkSareeEcommerce.Models.CartItem>
