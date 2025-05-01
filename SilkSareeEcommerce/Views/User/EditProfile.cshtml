@@ -1,0 +1,46 @@
+﻿@model SilkSareeEcommerce.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="container mx-auto p-6 max-w-lg">
+    <h2 class="text-3xl font-bold text-center text-purple-700 mb-6">Edit Profile</h2>
+
+    <form asp-action="EditProfile" method="post">
+        @Html.HiddenFor(model => model.Id)
+        <div class="form-group mb-4">
+            <label asp-for="FullName" class="block font-medium text-gray-700">Full Name</label>
+            <input asp-for="FullName" class="form-control w-full border p-2 rounded" />
+            <span asp-validation-for="FullName" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="form-group mb-4">
+            <label asp-for="Email" class="block font-medium text-gray-700">Email</label>
+            <input asp-for="Email" class="form-control w-full border p-2 rounded" readonly />
+            <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="form-group mb-4">
+            <label asp-for="PhoneNumber" class="block font-medium text-gray-700">Phone Number</label>
+            <input asp-for="PhoneNumber" class="form-control w-full border p-2 rounded" />
+            <span asp-validation-for="PhoneNumber" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="form-group mb-4">
+            <label asp-for="Address" class="block font-medium text-gray-700">Address</label>
+            <textarea asp-for="Address" class="form-control w-full border p-2 rounded"></textarea>
+            <span asp-validation-for="Address" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded">
+                Update Profile
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -52,7 +52,43 @@ namespace SilkSareeEcommerce.Services
             return await _userRepository.GetSavedAddressesByUserIdAsync(userId);
         }
 
-        
+
+        public async Task<List<SavedAddress>> GetListSavedAddressesAsync(string userId)
+        {
+            return await _userRepository.GetListSavedAddressesAsync(userId);
+        }
+
+        public async Task UpdateSavedAddressesAsync(List<SavedAddress> addresses)
+        {
+            foreach (var address in addresses)
+            {
+                await _userRepository.UpdateAddressAsync(address);
+            }
+        }
+
+        public async Task DeleteAddressAsync(int addressId)
+        {
+            await _userRepository.DeleteAddressAsync(addressId);
+        }
+
+        public async Task UpdateAddressAsync(SavedAddress address)
+        {
+            await _userRepository.UpdateAddressAsync(address);
+        }
+
+
+        public async Task UpdateUserAsync(ApplicationUser user, string userId)
+        {
+            await _userRepository.UpdateUserAsync(user, userId);
+        }
+
+
+        public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+        {
+            return await _userRepository.GetUserByIdAsync(userId);
+        }
+
+
 
     }
 }

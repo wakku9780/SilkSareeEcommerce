@@ -1,0 +1,28 @@
+﻿@model SilkSareeEcommerce.Models.SavedAddress
+
+@{
+    ViewData["Title"] = "Edit Address";
+}
+
+<h2>Edit Address</h2>
+
+<form asp-action="EditAddress" method="post">
+    @* Hidden fields properly bound *@
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="UserId" type="hidden" />
+
+    <div class="form-group">
+        <label asp-for="Address" class="control-label"></label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <div class="form-group form-check">
+        <input asp-for="IsDefault" class="form-check-input" />
+        <label asp-for="IsDefault" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+

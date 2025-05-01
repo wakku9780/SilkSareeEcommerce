@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "My Dashboard";
+}
+
+<div class="container mx-auto p-6">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-purple-700">Welcome to Your Dashboard</h1>
+        <p class="text-gray-600 mt-2">Manage your profile and address settings below</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Address Card -->
+        <div class="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition duration-300">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">📍 My Addresses</h2>
+            <p class="text-gray-600 mb-4">View, edit, delete or set default delivery addresses.</p>
+            <a href="@Url.Action("MyAddresses", "User")" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded">
+                Manage Addresses
+            </a>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition duration-300">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">👤 My Profile</h2>
+            <p class="text-gray-600 mb-4">Update your personal details and preferences.</p>
+            <a href="@Url.Action("EditProfile", "User")" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded">
+                Edit Profile
+            </a>
+        </div>
+
+
+    </div>
+</div>
+
+<!-- Optional: Add Tailwind CDN if not already present -->
+@section Scripts {
+    <script src="https://cdn.tailwindcss.com"></script>
+}

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SilkSareeEcommerce.Models;
+using SilkSareeEcommerce.Services;
 using SilkSareeEcommerce.ViewModels;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SilkSareeEcommerce.Controllers
@@ -11,12 +13,14 @@ namespace SilkSareeEcommerce.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserService _userService;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager,UserService userService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _userService = userService;
         }
 
         // Registration GET
@@ -177,6 +181,18 @@ namespace SilkSareeEcommerce.Controllers
 
             return View(model);
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> MyAddresses()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var addresses = await _userService.GetSavedAddressesAsync(userId);
+            return View(addresses); // Razor View banani padegi
+        }
+
+
+
 
     }
 }
