@@ -9,6 +9,12 @@ namespace SilkSareeEcommerce.Repositories
         Task<Product> GetByIdAsync(int id);  // Get product by id
         Task SaveAsync();  // Save changes to the database
         void DeleteProduct(Product product);  // Delete a product
+
+        Task<List<Category>> GetAllCategoriesAsync();
+
+
+        Task<List<Product>> SearchProductsAsync(string? name, int? categoryId, decimal? minPrice, decimal? maxPrice);
+
     }
 
 }

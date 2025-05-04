@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using SilkSareeEcommerce.Models;
 using SilkSareeEcommerce.Repositories;
+using static SilkSareeEcommerce.Services.ProductService;
 
 namespace SilkSareeEcommerce.Services
 {
@@ -42,7 +43,7 @@ namespace SilkSareeEcommerce.Services
             existingProduct.Name = product.Name;
             existingProduct.Description = product.Description;
             existingProduct.Price = product.Price;
-           
+
 
             // Save the updated product
             await _productRepository.SaveAsync();
@@ -59,7 +60,29 @@ namespace SilkSareeEcommerce.Services
                 await _productRepository.SaveAsync();
             }
         }
+
+
+
+
+
+
+
+        public async Task<List<Product>> SearchProductsAsync(string? name, int? categoryId, decimal? minPrice, decimal? maxPrice)
+        {
+            return await _productRepository.SearchProductsAsync(name, categoryId, minPrice, maxPrice);
+        }
+
+        public async Task<List<Category>> GetAllCategoriesAsync()
+        {
+            return await _productRepository.GetAllCategoriesAsync();
+        }
+
+
+
+
+
+
+
+
     }
-
-
 }

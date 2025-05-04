@@ -1,12 +1,149 @@
-﻿@model IEnumerable<SilkSareeEcommerce.Models.Product> 
-@* @model SilkSareeEcommerce.Models.Product *@
+﻿@model IEnumerable<SilkSareeEcommerce.Models.Product>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 
-@section Styles {
-    <script src="https://cdn.tailwindcss.com"></script>
+@{
+    var query = HttpContextAccessor.HttpContext.Request.Query;
 }
 
-
 <div class="container mt-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-white text-center">
+            <h2 class="mb-0">🛍️ Product List</h2>
+        </div>
+
+        <div class="card-body">
+
+            <!-- 🔍 Filter Form -->
+            <form asp-controller="Product" asp-action="Index" method="get" class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <input type="text" name="name" class="form-control" placeholder="Search by name" value="@query["name"]" />
+                </div>
+
+                <div class="col-md-3">
+                    <select name="categoryId" class="form-select">
+                        <option value="" selected="@string.IsNullOrEmpty(query["categoryId"])">All Categories</option>
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.Id"
+                                    selected="@(query["categoryId"] == category.Id.ToString())">
+                                @category.Name
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <input type="number" step="0.01" name="minPrice" class="form-control" placeholder="Min Price" value="@query["minPrice"]" />
+                </div>
+
+                <div class="col-md-2">
+                    <input type="number" step="0.01" name="maxPrice" class="form-control" placeholder="Max Price" value="@query["maxPrice"]" />
+                </div>
+
+                <div class="col-md-2 text-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </form>
+
+            <!-- 🛍️ Product Grid -->
+            <div class="text-end mb-3">
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </a>
+                }
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                @foreach (var product in Model)
+                {
+                    <div class="col">
+                        <div class="card shadow-lg border-0 product-card h-100">
+                            <img src="@product.ImageUrl" class="card-img-top product-image" alt="@product.Name">
+                            <div class="card-body text-center">
+                                <h5 class="card-title fw-bold">@product.Name</h5>
+                                <p class="card-text text-muted">
+                                    @(product.Description.Length > 50 ? product.Description.Substring(0, 50) + "..." : product.Description)
+                                </p>
+                                <p class="text-success fw-bold fs-5">₹@product.Price</p>
+                                <span class="badge bg-primary">@product.Category?.Name</span>
+                            </div>
+                            <div class="card-footer bg-white text-center">
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-action="Details" asp-route-id="@product.Id" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </a>
+                                    <form asp-controller="Product" asp-action="AddToCart" method="post" class="d-inline">
+                                        <input type="hidden" name="productId" value="@product.Id" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                                        </button>
+                                    </form>
+                                    <a asp-action="BuyNow" asp-route-id="@product.Id" class="btn btn-success btn-sm">
+                                        <i class="fas fa-bolt"></i> Buy Now
+                                    </a>
+                                    <a asp-controller="Wishlist" asp-action="Add" asp-route-productId="@product.Id" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-heart"></i> Add to Wishlist
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<style>
+    .product-card {
+        transition: transform 0.3s ease-in-out;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .product-card:hover {
+        transform: scale(1.05);
+    }
+
+    .product-image {
+        height: 250px;
+        object-fit: cover;
+    }
+
+    .card-footer a {
+        margin: 5px;
+    }
+</style>
+
+
+
+@* @model IEnumerable<SilkSareeEcommerce.Models.Product>  *@
+@* @model SilkSareeEcommerce.Models.Product *@
+
+@* @section Styles {
+    <script src="https://cdn.tailwindcss.com"></script>
+}
+ *@
+
+@* <div class="container mt-4">
     <div class="card shadow-lg border-0">
         <div class="card-header bg-dark text-white text-center">
             <h2 class="mb-0">🛍️ Product List</h2>
@@ -106,29 +243,29 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@@
 
-<!-- Bootstrap & FontAwesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+@* <!-- Bootstrap & FontAwesome --> *@
+@* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"> *@
 
-<!-- Custom CSS -->
-<style>
-    .product-card {
-        transition: transform 0.3s ease-in-out;
-        border-radius: 15px;
-        overflow: hidden;
-    }
+@* <!-- Custom CSS --> *@
+@* <style> *@
+@*     .product-card { *@
+@*         transition: transform 0.3s ease-in-out; *@
+@*         border-radius: 15px; *@
+@*         overflow: hidden; *@
+@*     } *@
 
-        .product-card:hover {
-            transform: scale(1.05);
-        }
+@*         .product-card:hover { *@
+@*             transform: scale(1.05); *@
+@*         } *@
 
-    .product-image {
-        height: 250px;
-        object-fit: cover;
-    }
+@*     .product-image { *@
+@*         height: 250px; *@
+@*         object-fit: cover; *@
+@*     } *@
 
-    .card-footer a {
-        margin: 5px;
-    }
-</style>
+@*     .card-footer a { *@
+@*         margin: 5px; *@
+@*     } *@
+@* </style> *@

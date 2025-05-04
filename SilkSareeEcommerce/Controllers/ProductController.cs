@@ -31,11 +31,21 @@ namespace SilkSareeEcommerce.Controllers
             _userService = userService;
         }
 
-        public async Task<IActionResult> Index()
+        //public async Task<IActionResult> Index()
+        //{
+        //    var products = await _productService.GetAllProductsAsync();
+        //    return View(products);
+        //}
+
+
+        public async Task<IActionResult> Index(string? name, int? categoryId, decimal? minPrice, decimal? maxPrice)
         {
-            var products = await _productService.GetAllProductsAsync();
+            var products = await _productService.SearchProductsAsync(name, categoryId, minPrice, maxPrice);
+            ViewBag.Categories = await _productService.GetAllCategoriesAsync();  // for dropdown
             return View(products);
         }
+
+
 
         public async Task<IActionResult> Create()
         {
