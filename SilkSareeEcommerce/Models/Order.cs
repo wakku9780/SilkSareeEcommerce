@@ -1,4 +1,6 @@
-﻿namespace SilkSareeEcommerce.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SilkSareeEcommerce.Models
 {
     public class Order
     {
@@ -13,5 +15,12 @@
         // Navigation Properties
         public ApplicationUser User { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+        // Use SavedAddress as a reference
+        public int ShippingAddressId { get; set; }
+
+        [ForeignKey("ShippingAddressId")]
+        public SavedAddress ShippingAddress { get; set; }
+
     }
 }

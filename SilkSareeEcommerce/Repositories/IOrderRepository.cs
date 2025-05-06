@@ -12,6 +12,8 @@ namespace SilkSareeEcommerce.Repositories
         Task<bool> UpdateOrderStatusAsync(int orderId, string newStatus);
         Task<Order> CreateOrderAsync(Order order);
 
+        Task<Order> GetOrderWithDetailsAsync(int orderId);
+
 
     }
 }

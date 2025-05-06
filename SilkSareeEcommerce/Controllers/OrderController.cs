@@ -137,6 +137,123 @@ namespace SilkSareeEcommerce.Controllers
 
 
 
+        //[HttpPost]
+        //public async Task<IActionResult> PlaceOrderWithAddress(string PaymentMethod, string ShippingAddress, bool SaveAddress)
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+        //    if (cartItems == null || !cartItems.Any())
+        //    {
+        //        TempData["Error"] = "Your cart is empty!";
+        //        return RedirectToAction("ViewCart", "Product");
+        //    }
+
+        //    // ✅ Save the shipping address if requested
+        //    if (SaveAddress && !string.IsNullOrWhiteSpace(ShippingAddress))
+        //    {
+        //        await _userService.SaveAddressAsync(userId, ShippingAddress);
+        //    }
+
+        //    if (PaymentMethod == "COD")
+        //    {
+        //        // ✅ Place order with Cash on Delivery
+        //        var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD");
+
+        //        if (order == null)
+        //        {
+        //            TempData["Error"] = "Failed to place order! due to out of stock";
+        //            return RedirectToAction("Checkout", "Order");
+        //        }
+
+        //        await _cartService.ClearCartAsync(userId);
+
+        //        TempData["Success"] = "Your order has been placed successfully with Cash on Delivery!";
+        //        return RedirectToAction("OrderSuccess");
+        //    }
+        //    else if (PaymentMethod == "PayPal")
+        //    {
+        //        // ✅ Store shipping address temporarily if needed
+        //        TempData["ShippingAddress"] = ShippingAddress;
+
+        //        // ✅ Redirect to PayPal Payment Page
+        //        return RedirectToAction("PayWithPayPal", "Payment");
+        //    }
+
+        //    TempData["Error"] = "Invalid Payment Method!";
+        //    return RedirectToAction("Checkout", "Order");
+        //}
+
+
+
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> PlaceOrderWithAddress(string PaymentMethod, string ShippingAddress, bool SaveAddress)
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+        //    if (cartItems == null || !cartItems.Any())
+        //    {
+        //        TempData["Error"] = "Your cart is empty!";
+        //        return RedirectToAction("ViewCart", "Product");
+        //    }
+
+        //    // ✅ Save the shipping address if user requested
+        //    if (SaveAddress && !string.IsNullOrWhiteSpace(ShippingAddress))
+        //    {
+        //        await _userService.SaveAddressAsync(userId, ShippingAddress);
+        //    }
+
+        //    if (PaymentMethod == "COD")
+        //    {
+        //        // ✅ Place order with Cash on Delivery
+        //        var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD");
+
+        //        if (order == null)
+        //        {
+        //            TempData["Error"] = "Failed to place order! due to out of stock";
+        //            return RedirectToAction("Checkout", "Order");
+        //        }
+
+        //        await _cartService.ClearCartAsync(userId);
+
+        //        // ✅ Generate PDF Invoice
+        //        var invoicePdf = await _orderService.GenerateOrderInvoiceAsync(order.Id);
+
+        //        // ✅ Return PDF to user as download (or redirect, your choice)
+        //        return File(invoicePdf, "application/pdf", $"Order_{order.Id}_Invoice.pdf");
+
+        //        // OR you could store and redirect:
+        //        // TempData["Invoice"] = Convert.ToBase64String(invoicePdf);
+        //        // return RedirectToAction("OrderSuccess");
+        //    }
+        //    else if (PaymentMethod == "PayPal")
+        //    {
+        //        // ✅ Store shipping address temporarily if needed
+        //        TempData["ShippingAddress"] = ShippingAddress;
+
+        //        // ✅ Redirect to PayPal Payment Page
+        //        return RedirectToAction("PayWithPayPal", "Payment");
+        //    }
+
+        //    TempData["Error"] = "Invalid Payment Method!";
+        //    return RedirectToAction("Checkout", "Order");
+        //}
+
+
+
+
+
         [HttpPost]
         public async Task<IActionResult> PlaceOrderWithAddress(string PaymentMethod, string ShippingAddress, bool SaveAddress)
         {
@@ -153,16 +270,18 @@ namespace SilkSareeEcommerce.Controllers
                 return RedirectToAction("ViewCart", "Product");
             }
 
-            // ✅ Save the shipping address if requested
+            // ✅ Save the shipping address if user requested
+            int shippingAddressId = 0;
             if (SaveAddress && !string.IsNullOrWhiteSpace(ShippingAddress))
             {
-                await _userService.SaveAddressAsync(userId, ShippingAddress);
+                var savedAddress = await _userService.SaveAddress1Async(userId, ShippingAddress);
+                shippingAddressId = savedAddress.Id; // Address save hone ke baad uska Id assign karo
             }
 
             if (PaymentMethod == "COD")
             {
                 // ✅ Place order with Cash on Delivery
-                var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD");
+                var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD", shippingAddressId);
 
                 if (order == null)
                 {
@@ -172,8 +291,11 @@ namespace SilkSareeEcommerce.Controllers
 
                 await _cartService.ClearCartAsync(userId);
 
-                TempData["Success"] = "Your order has been placed successfully with Cash on Delivery!";
-                return RedirectToAction("OrderSuccess");
+                // ✅ Generate PDF Invoice
+                var invoicePdf = await _orderService.GenerateOrderInvoiceAsync(order.Id);
+
+                // ✅ Return PDF to user as download (or redirect, your choice)
+                return File(invoicePdf, "application/pdf", $"Order_{order.Id}_Invoice.pdf");
             }
             else if (PaymentMethod == "PayPal")
             {
@@ -187,6 +309,13 @@ namespace SilkSareeEcommerce.Controllers
             TempData["Error"] = "Invalid Payment Method!";
             return RedirectToAction("Checkout", "Order");
         }
+
+
+
+
+
+
+
 
 
 

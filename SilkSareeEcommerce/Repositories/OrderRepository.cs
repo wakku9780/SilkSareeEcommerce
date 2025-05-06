@@ -96,6 +96,20 @@ namespace SilkSareeEcommerce.Repositories
         //    return order;
         //}
 
+
+        public async Task<Order> GetOrderWithDetailsAsync(int orderId)
+        {
+            return await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+        }
+
+
+
+
+
     }
 
 }

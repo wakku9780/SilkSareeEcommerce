@@ -56,6 +56,24 @@ namespace SilkSareeEcommerce.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<SavedAddress> SaveAddress1Async(string userId, string address)
+        {
+            var savedAddress = new SavedAddress
+            {
+                UserId = userId,
+                Address = address,
+                IsDefault = true // ya false, depending on aapka logic
+            };
+
+            _context.SavedAddresses.Add(savedAddress);
+            await _context.SaveChangesAsync();
+
+            return savedAddress;  // Address ko save karne ke baad uska Id return karenge
+        }
+
+
+
+
 
         //public async Task SaveAddressAsync(string userId, string address)
         //{

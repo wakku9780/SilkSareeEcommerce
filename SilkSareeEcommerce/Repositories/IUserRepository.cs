@@ -12,6 +12,8 @@ namespace SilkSareeEcommerce.Repositories
         Task SaveAddressAsync(string userId, string address);
         // Add any other necessary methods.
 
+        Task<SavedAddress> SaveAddress1Async(string userId, string address);
+
         Task<List<string>> GetSavedAddressesByUserIdAsync(string userId);
 
         // ✅ Add these instead:

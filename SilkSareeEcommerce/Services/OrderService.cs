@@ -12,10 +12,13 @@ namespace SilkSareeEcommerce.Services
     public class OrderService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly PdfService _pdfService;
 
-        public OrderService(IOrderRepository orderRepository)
+
+        public OrderService(IOrderRepository orderRepository, PdfService pdfService)
         {
             _orderRepository = orderRepository;
+            _pdfService = pdfService;
         }
 
         public async Task<List<Order>> GetAllOrdersAsync()
@@ -62,6 +65,31 @@ namespace SilkSareeEcommerce.Services
 
             return await _orderRepository.CreateOrderAsync(order);
         }
+
+
+        public async Task<Order?> CreateOrderAsync(string userId, List<CartItem> cartItems, string paymentMethod, int shippingAddressId)
+        {
+            if (cartItems == null || !cartItems.Any()) return null;
+
+            var order = new Order
+            {
+                UserId = userId,
+                OrderDate = DateTime.UtcNow,
+                TotalAmount = cartItems.Sum(item => item.Quantity * item.Product.Price),
+                PaymentMethod = paymentMethod, // ✅ Payment method save kar raha hai
+                Status = (paymentMethod == "COD") ? "Confirmed" : "Pending", // ✅ COD ke liye Confirmed, PayPal ke liye Pending
+                ShippingAddressId = shippingAddressId,  // Added shippingAddressId here
+                OrderItems = cartItems.Select(item => new OrderItem
+                {
+                    ProductId = item.Product.Id,
+                    Quantity = item.Quantity,
+                    Price = item.Product.Price
+                }).ToList()
+            };
+
+            return await _orderRepository.CreateOrderAsync(order);
+        }
+
 
 
         //public async Task<Order?> CreateOrderAsync(string userId, List<CartItem> cartItems)
@@ -131,6 +159,32 @@ namespace SilkSareeEcommerce.Services
             //    await _orderRepository.CreateOrderAsync(order);
             //}
         }
+
+
+        //public async Task<byte[]> GenerateOrderInvoiceAsync(int orderId)
+        //{
+        //    var order = await _orderRepository.GetOrderWithDetailsAsync(orderId);
+        //    if (order == null) throw new Exception("Order not found!");
+
+        //    return _pdfService.GenerateOrderPdf(order); // You'll create this in PDF service
+        //}
+
+        public async Task<byte[]> GenerateOrderInvoiceAsync(int orderId)
+        {
+            var order = await _orderRepository.GetOrderWithDetailsAsync(orderId);
+            if (order == null) throw new Exception("Order not found!");
+
+            // Access the ShippingAddress from the order (as it's a navigation property)
+            var shippingAddress = order.ShippingAddress?.Address;
+
+            // Now, generate the invoice using the shipping address and other order details
+            return _pdfService.GenerateOrderPdf(order, shippingAddress); // You can pass the shipping address too if required
+        }
+
+
+
+
+
 
     }
 }
