@@ -254,61 +254,360 @@ namespace SilkSareeEcommerce.Controllers
 
 
 
+
+
         [HttpPost]
-        public async Task<IActionResult> PlaceOrderWithAddress(string PaymentMethod, string ShippingAddress, bool SaveAddress)
+        public async Task<IActionResult> PlaceOrderWithAddress(CheckoutViewModel model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
             var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
-            if (cartItems == null || !cartItems.Any())
+            if (!cartItems.Any())
             {
                 TempData["Error"] = "Your cart is empty!";
                 return RedirectToAction("ViewCart", "Product");
             }
 
-            // ✅ Save the shipping address if user requested
-            int shippingAddressId = 0;
-            if (SaveAddress && !string.IsNullOrWhiteSpace(ShippingAddress))
+            // 🛠️ Fixed logic: Check priority - 1) SelectedSavedAddress 2) ExistingAddress 3) ShippingAddress
+            string finalShippingAddress = !string.IsNullOrWhiteSpace(model.SelectedSavedAddress)
+                ? model.SelectedSavedAddress
+                : !string.IsNullOrWhiteSpace(model.ExistingAddress)
+                    ? model.ExistingAddress
+                    : model.ShippingAddress;
+
+            if (string.IsNullOrWhiteSpace(finalShippingAddress))
             {
-                var savedAddress = await _userService.SaveAddress1Async(userId, ShippingAddress);
-                shippingAddressId = savedAddress.Id; // Address save hone ke baad uska Id assign karo
+                TempData["Error"] = "Please provide or select a shipping address.";
+                return RedirectToAction("Checkout", "Product");
             }
 
-            if (PaymentMethod == "COD")
-            {
-                // ✅ Place order with Cash on Delivery
-                var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD", shippingAddressId);
+            int shippingAddressId = 0;
 
+            if (!string.IsNullOrWhiteSpace(model.SelectedSavedAddress))
+            {
+                // 🟢 Convert selected saved address ID string to int
+                int.TryParse(model.SelectedSavedAddress, out shippingAddressId);
+            }
+            else if (model.SaveAddress && !string.IsNullOrWhiteSpace(model.ShippingAddress))
+            {
+                var savedAddress = await _userService.SaveAddress1Async(userId, model.ShippingAddress);
+                shippingAddressId = savedAddress.Id;
+            }
+
+
+            if (model.PaymentMethod == "COD")
+            {
+                var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD", shippingAddressId);
                 if (order == null)
                 {
-                    TempData["Error"] = "Failed to place order! due to out of stock";
-                    return RedirectToAction("Checkout", "Order");
+                    TempData["Error"] = "Failed to place order due to out of stock.";
+                    return RedirectToAction("Checkout", "Product");
                 }
 
                 await _cartService.ClearCartAsync(userId);
 
-                // ✅ Generate PDF Invoice
                 var invoicePdf = await _orderService.GenerateOrderInvoiceAsync(order.Id);
+                var invoiceDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "invoices");
+                if (!Directory.Exists(invoiceDir)) Directory.CreateDirectory(invoiceDir);
 
-                // ✅ Return PDF to user as download (or redirect, your choice)
-                return File(invoicePdf, "application/pdf", $"Order_{order.Id}_Invoice.pdf");
+                var fileName = $"Order_{order.Id}_Invoice.pdf";
+                var fullPath = Path.Combine(invoiceDir, fileName);
+                System.IO.File.WriteAllBytes(fullPath, invoicePdf);
+
+                TempData["Success"] = "Your order has been placed successfully with Cash on Delivery!";
+                TempData["InvoiceFile"] = "/invoices/" + fileName;
+
+                return RedirectToAction("OrderSuccess");
             }
-            else if (PaymentMethod == "PayPal")
+            else if (model.PaymentMethod == "PayPal")
             {
-                // ✅ Store shipping address temporarily if needed
-                TempData["ShippingAddress"] = ShippingAddress;
-
-                // ✅ Redirect to PayPal Payment Page
+                TempData["ShippingAddress"] = finalShippingAddress;
                 return RedirectToAction("PayWithPayPal", "Payment");
             }
 
             TempData["Error"] = "Invalid Payment Method!";
             return RedirectToAction("Checkout", "Order");
         }
+
+
+
+
+
+        //important2
+        //[HttpPost]
+        //public async Task<IActionResult> PlaceOrderWithAddress(CheckoutViewModel model)
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        //    var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+        //    if (!cartItems.Any())
+        //    {
+        //        TempData["Error"] = "Your cart is empty!";
+        //        return RedirectToAction("ViewCart", "Product");
+        //    }
+
+        //    string finalShippingAddress = !string.IsNullOrWhiteSpace(model.ExistingAddress)
+        //        ? model.ExistingAddress
+        //        : model.ShippingAddress;
+
+        //    if (string.IsNullOrWhiteSpace(finalShippingAddress))
+        //    {
+        //        TempData["Error"] = "Please provide or select a shipping address.";
+        //        return RedirectToAction("Checkout", "Product");
+        //    }
+
+        //    int shippingAddressId = 0;
+        //    if (model.SaveAddress)
+        //    {
+        //        var savedAddress = await _userService.SaveAddress1Async(userId, finalShippingAddress);
+        //        shippingAddressId = savedAddress.Id;
+        //    }
+
+        //    if (model.PaymentMethod == "COD")
+        //    {
+        //        var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD", shippingAddressId);
+        //        if (order == null)
+        //        {
+        //            TempData["Error"] = "Failed to place order due to out of stock.";
+        //            return RedirectToAction("Checkout", "Product");
+        //        }
+
+        //        await _cartService.ClearCartAsync(userId);
+
+        //        // ✅ Generate invoice PDF
+        //        var invoicePdf = await _orderService.GenerateOrderInvoiceAsync(order.Id);
+
+        //        // ✅ Save PDF to wwwroot/invoices
+        //        var invoiceDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "invoices");
+        //        if (!Directory.Exists(invoiceDir)) Directory.CreateDirectory(invoiceDir);
+
+        //        var fileName = $"Order_{order.Id}_Invoice.pdf";
+        //        var fullPath = Path.Combine(invoiceDir, fileName);
+        //        System.IO.File.WriteAllBytes(fullPath, invoicePdf);
+
+        //        TempData["Success"] = "Your order has been placed successfully with Cash on Delivery!";
+        //        TempData["InvoiceFile"] = "/invoices/" + fileName;
+
+        //        return RedirectToAction("OrderSuccess");
+        //    }
+        //    else if (model.PaymentMethod == "PayPal")
+        //    {
+        //        TempData["ShippingAddress"] = finalShippingAddress;
+        //        return RedirectToAction("PayWithPayPal", "Payment");
+        //    }
+
+        //    TempData["Error"] = "Invalid Payment Method!";
+        //    return RedirectToAction("Checkout", "Order");
+        //}
+
+
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> PlaceOrderWithAddress(CheckoutViewModel model)
+        //{
+        //    Console.WriteLine($"ExistingAddress: {model.ExistingAddress}");
+        //    Console.WriteLine($"ShippingAddress: {model.ShippingAddress}");
+
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+        //    if (cartItems == null || !cartItems.Any())
+        //    {
+        //        TempData["Error"] = "Your cart is empty!";
+        //        return RedirectToAction("ViewCart", "Product");
+        //    }
+
+        //    // Use selected saved address if available
+        //    string finalShippingAddress = !string.IsNullOrWhiteSpace(model.ExistingAddress)
+        //        ? model.ExistingAddress
+        //        : model.ShippingAddress;
+
+        //    if (string.IsNullOrWhiteSpace(finalShippingAddress))
+        //    {
+        //        TempData["Error"] = "Please provide or select a shipping address.";
+        //        return RedirectToAction("Checkout", "Product");
+        //    }
+
+        //    int shippingAddressId = 0;
+        //    if (model.SaveAddress && !string.IsNullOrWhiteSpace(finalShippingAddress))
+        //    {
+        //        var savedAddress = await _userService.SaveAddress1Async(userId, finalShippingAddress);
+        //        shippingAddressId = savedAddress.Id;
+        //    }
+
+        //    if (model.PaymentMethod == "COD")
+        //    {
+        //        var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD", shippingAddressId);
+
+        //        if (order == null)
+        //        {
+        //            TempData["Error"] = "Failed to place order due to out of stock";
+        //            return RedirectToAction("Checkout", "Product");
+        //        }
+
+        //        // Clear Cart after order placement
+        //        await _cartService.ClearCartAsync(userId);
+
+        //        // Generate the invoice PDF for the order
+        //        var invoicePdf = await _orderService.GenerateOrderInvoiceAsync(order.Id);
+
+        //        // Save the PDF file somewhere on server or memory
+        //        // (e.g. save it in a temporary file or memory stream)
+        //        // var filePath = Path.Combine(Path.GetTempPath(), $"Order_{order.Id}_Invoice.pdf");
+        //       var filePath= File(invoicePdf, "application/pdf", $"Order_{order.Id}_Invoice.pdf");
+
+        //       // System.IO.File.WriteAllBytes(filePath, invoicePdf);
+
+
+        //        //        var invoicePdf = await _orderService.GenerateOrderInvoiceAsync(order.Id);
+        //        //        return File(invoicePdf, "application/pdf", $"Order_{order.Id}_Invoice.pdf");
+
+        //        // Return the generated PDF to the client
+        //        TempData["Success"] = "Your order has been placed successfully with Cash on Delivery!";
+        //        return View("OrderSuccess", new { invoiceFilePath = filePath });
+        //    }
+        //    else if (model.PaymentMethod == "PayPal")
+        //    {
+        //        TempData["ShippingAddress"] = finalShippingAddress;
+        //        return RedirectToAction("PayWithPayPal", "Payment");
+        //    }
+
+        //    TempData["Error"] = "Invalid Payment Method!";
+        //    return RedirectToAction("Checkout", "Order");
+        //}
+
+
+
+
+
+        //important
+        //[HttpPost]
+        //public async Task<IActionResult> PlaceOrderWithAddress(CheckoutViewModel model)
+        //{
+
+        //    Console.WriteLine($"ExistingAddress: {model.ExistingAddress}");
+        //    Console.WriteLine($"ShippingAddress: {model.ShippingAddress}");
+
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+        //    if (cartItems == null || !cartItems.Any())
+        //    {
+        //        TempData["Error"] = "Your cart is empty!";
+        //        return RedirectToAction("ViewCart", "Product");
+        //    }
+
+        //    // ✅ Use selected saved address if available
+        //    string finalShippingAddress = !string.IsNullOrWhiteSpace(model.ExistingAddress)
+        //        ? model.ExistingAddress
+        //        : model.ShippingAddress;
+
+        //    if (string.IsNullOrWhiteSpace(finalShippingAddress))
+        //    {
+        //        TempData["Error"] = "Please provide or select a shipping address.";
+        //        return RedirectToAction("Checkout", "Product");
+        //    }
+
+        //    int shippingAddressId = 0;
+        //    if (model.SaveAddress && !string.IsNullOrWhiteSpace(finalShippingAddress))
+        //    {
+        //        var savedAddress = await _userService.SaveAddress1Async(userId, finalShippingAddress);
+        //        shippingAddressId = savedAddress.Id;
+        //    }
+
+        //    if (model.PaymentMethod == "COD")
+        //    {
+        //        var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD", shippingAddressId);
+
+        //        if (order == null)
+        //        {
+        //            TempData["Error"] = "Failed to place order! due to out of stock";
+        //            return RedirectToAction("Checkout", "Product");
+        //        }
+
+        //        await _cartService.ClearCartAsync(userId);
+        //        var invoicePdf = await _orderService.GenerateOrderInvoiceAsync(order.Id);
+        //        return File(invoicePdf, "application/pdf", $"Order_{order.Id}_Invoice.pdf");
+        //    }
+        //    else if (model.PaymentMethod == "PayPal")
+        //    {
+        //        TempData["ShippingAddress"] = finalShippingAddress;
+        //        return RedirectToAction("PayWithPayPal", "Payment");
+        //    }
+
+        //    TempData["Error"] = "Invalid Payment Method!";
+        //    return RedirectToAction("Checkout", "Order");
+        //}
+
+
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> PlaceOrderWithAddress(string PaymentMethod, string ShippingAddress, bool SaveAddress)
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+        //    if (cartItems == null || !cartItems.Any())
+        //    {
+        //        TempData["Error"] = "Your cart is empty!";
+        //        return RedirectToAction("ViewCart", "Product");
+        //    }
+
+        //    // ✅ Save the shipping address if user requested
+        //    int shippingAddressId = 0;
+        //    if (SaveAddress && !string.IsNullOrWhiteSpace(ShippingAddress))
+        //    {
+        //        var savedAddress = await _userService.SaveAddress1Async(userId, ShippingAddress);
+        //        shippingAddressId = savedAddress.Id; // Address save hone ke baad uska Id assign karo
+        //    }
+
+        //    if (PaymentMethod == "COD")
+        //    {
+        //        // ✅ Place order with Cash on Delivery
+        //        var order = await _orderService.CreateOrderAsync(userId, cartItems, "COD", shippingAddressId);
+
+        //        if (order == null)
+        //        {
+        //            TempData["Error"] = "Failed to place order! due to out of stock";
+        //            return RedirectToAction("Checkout", "Order");
+        //        }
+
+        //        await _cartService.ClearCartAsync(userId);
+
+        //        // ✅ Generate PDF Invoice
+        //        var invoicePdf = await _orderService.GenerateOrderInvoiceAsync(order.Id);
+
+        //        // ✅ Return PDF to user as download (or redirect, your choice)
+        //        return File(invoicePdf, "application/pdf", $"Order_{order.Id}_Invoice.pdf");
+        //    }
+        //    else if (PaymentMethod == "PayPal")
+        //    {
+        //        // ✅ Store shipping address temporarily if needed
+        //        TempData["ShippingAddress"] = ShippingAddress;
+
+        //        // ✅ Redirect to PayPal Payment Page
+        //        return RedirectToAction("PayWithPayPal", "Payment");
+        //    }
+
+        //    TempData["Error"] = "Invalid Payment Method!";
+        //    return RedirectToAction("Checkout", "Order");
+        //}
 
 
 

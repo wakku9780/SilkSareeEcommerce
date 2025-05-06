@@ -260,11 +260,16 @@ namespace SilkSareeEcommerce.Controllers
             {
                 CartItems = cartItems,
                 TotalAmount = totalAmount,
-                SavedAddresses = savedAddresses
+                SavedAddresses = savedAddresses.Select((address, index) => new SavedAddressDto
+                {
+                    Id = index + 1, // agar real DB ID nahi hai
+                    Address = address
+                }).ToList()
             };
 
 
-           
+
+
 
             return View(checkoutViewModel);
         }

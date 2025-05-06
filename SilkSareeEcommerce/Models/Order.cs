@@ -17,7 +17,7 @@ namespace SilkSareeEcommerce.Models
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
         // Use SavedAddress as a reference
-        public int ShippingAddressId { get; set; }
+        public int? ShippingAddressId { get; set; }
 
         [ForeignKey("ShippingAddressId")]
         public SavedAddress ShippingAddress { get; set; }

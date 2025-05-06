@@ -1,13 +1,17 @@
 ﻿@model SilkSareeEcommerce.Models.CheckoutViewModel
 
+@section Styles {
+    <script src="https://cdn.tailwindcss.com"></script>
+}
+
 <h2>Checkout Order</h2>
 
-@* @if (TempData["Error"] != null)
+@if (TempData["Error"] != null)
 {
     <div class="alert alert-danger">
         @TempData["Error"]
     </div>
-} *@
+}
 
 <table class="table">
     <thead>
@@ -33,17 +37,83 @@
 
 <h4>Total: @Model.TotalAmount.ToString("C")</h4>
 
-<form asp-controller="Order" asp-action="PlaceOrder" method="post">
+<form asp-controller="Order" asp-action="PlaceOrderWithAddress" method="post">
     <div class="form-group">
         <label>Select Payment Method:</label>
         <select asp-for="PaymentMethod" class="form-control" required>
             <option value="COD">Cash on Delivery</option>
             <option value="PayPal">Pay with PayPal</option>
         </select>
-        <h4>Shipping Address</h4>
-        <input type="text" name="ShippingAddress" placeholder="Enter Shipping Address" class="form-control" required />
-
     </div>
 
-    <button type="submit" class="btn btn-primary">Place Order</button>
+    @* Show existing address if available *@
+    @if (!string.IsNullOrEmpty(Model.ExistingAddress))
+    {
+        <div class="alert alert-info">
+            <strong>Saved Address:</strong> @Model.ExistingAddress
+        </div>
+    }
+
+    @* Saved Addresses Dropdown *@
+    @if (Model.SavedAddresses != null && Model.SavedAddresses.Any())
+    {
+        <div class="form-group">
+            <label>Select from Saved Addresses:</label>
+            <select asp-for="SelectedSavedAddress" id="savedAddressDropdown" class="form-control">
+                <option value="">-- Select an address --</option>
+                @foreach (var address in Model.SavedAddresses)
+                {
+                    <option value="@address">@address</option>
+                }
+            </select>
+        </div>
+    }
+
+    <div class="form-group mt-3">
+        <label>Enter New Shipping Address:</label>
+        <input asp-for="ShippingAddress" class="form-control" placeholder="Enter Shipping Address" id="shippingAddressInput" />
+    </div>
+
+    <div class="form-check mt-2">
+        <input asp-for="SaveAddress" class="form-check-input" id="saveAddressCheck" />
+        <label class="form-check-label" for="saveAddressCheck">Save this address for future orders</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Place Order</button>
 </form>
+
+<script>
+    const savedAddressDropdown = document.getElementById('savedAddressDropdown');
+    const shippingAddressInput = document.getElementById('shippingAddressInput');
+    const saveAddressCheckbox = document.getElementById('saveAddressCheck');
+
+    if (savedAddressDropdown) {
+        savedAddressDropdown.addEventListener('change', function () {
+            const selectedValue = this.value;
+
+            if (selectedValue !== "") {
+                // If a saved address is selected, fill and disable input
+                shippingAddressInput.value = selectedValue;
+                shippingAddressInput.disabled = true;
+
+                saveAddressCheckbox.disabled = true;
+                saveAddressCheckbox.checked = false;
+            } else {
+                // Enable the input for new address
+                shippingAddressInput.disabled = false;
+                saveAddressCheckbox.disabled = false;
+            }
+        });
+    }
+
+    // When Save Address is checked, handle the new address input accordingly
+    saveAddressCheckbox?.addEventListener('change', function () {
+        if (this.checked && shippingAddressInput.value.trim() !== "") {
+            // If Save Address is checked, save the entered address
+            savedAddressDropdown.disabled = true; // Disable dropdown
+        } else {
+            savedAddressDropdown.disabled = false; // Enable dropdown if Save Address isn't checked
+        }
+    });
+</script>
+

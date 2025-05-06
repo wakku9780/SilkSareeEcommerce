@@ -22,7 +22,7 @@ namespace SilkSareeEcommerce.Services
             <body>
                 <h2>Order Invoice - #{order.Id}</h2>
                 <p><strong>Date:</strong> {DateTime.Now}</p>
-                <p><strong>Shipping Address:</strong> {order.ShippingAddress}</p>
+                <p><strong>Shipping Address:</strong> {order.ShippingAddress.Address}</p>
                 <h3>Items:</h3>
                 <ul>
                     {string.Join("", order.OrderItems.Select(item => $"<li>{item.Product.Name} - {item.Quantity} x ₹{item.Price}</li>"))}

@@ -54,6 +54,7 @@ namespace SilkSareeEcommerce.Repositories
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // ✅ Stock check and reduce
                 foreach (var item in order.OrderItems)
                 {
                     var product = await _context.Products
@@ -76,18 +77,45 @@ namespace SilkSareeEcommerce.Repositories
                     _context.Products.Update(product);
                 }
 
+                Console.WriteLine("ShippingAddressId: " + order.ShippingAddressId);
+
+                // ✅ Shipping Address check
+                if (order.ShippingAddressId > 0)
+                {
+                    var existingAddress = await _context.SavedAddresses
+                        .FirstOrDefaultAsync(a => a.Id == order.ShippingAddressId);
+
+                    if (existingAddress == null)
+                    {
+                        throw new Exception($"Invalid ShippingAddressId: {order.ShippingAddressId}. Address not found.");
+                    }
+                }
+                else if (order.ShippingAddress != null)
+                {
+                    _context.SavedAddresses.Add(order.ShippingAddress);
+                    await _context.SaveChangesAsync();
+                    order.ShippingAddressId = order.ShippingAddress.Id;
+                }
+                else
+                {
+                    throw new Exception("No valid ShippingAddressId or ShippingAddress object provided.");
+                }
+
+                // ✅ Place order
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return order;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine("Order saving failed: " + ex.Message);
                 await transaction.RollbackAsync();
                 return null;
             }
         }
+
 
         //public async Task<Order> CreateOrderAsync(Order order)
         //{

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SilkSareeEcommerce.Data;
 
@@ -11,9 +12,11 @@ using SilkSareeEcommerce.Data;
 namespace SilkSareeEcommerce.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250506122708_selectedAddresses")]
+    partial class selectedAddresses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -320,7 +323,7 @@ namespace SilkSareeEcommerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ShippingAddressId")
+                    b.Property<int>("ShippingAddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
@@ -574,7 +577,9 @@ namespace SilkSareeEcommerce.Migrations
                 {
                     b.HasOne("SilkSareeEcommerce.Models.SavedAddress", "ShippingAddress")
                         .WithMany()
-                        .HasForeignKey("ShippingAddressId");
+                        .HasForeignKey("ShippingAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SilkSareeEcommerce.Models.ApplicationUser", "User")
                         .WithMany("Orders")

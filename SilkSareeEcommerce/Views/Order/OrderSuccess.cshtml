@@ -5,8 +5,41 @@
 <div class="container mt-5">
     <div class="alert alert-success text-center">
         <h2>🎉 Order Placed Successfully!</h2>
+        <p>@TempData["Success"]</p>
+
+        @if (TempData["InvoiceFile"] != null)
+        {
+            <p>
+                <a href="@TempData["InvoiceFile"]" target="_blank" class="btn btn-success">
+                    Download Invoice PDF
+                </a>
+            </p>
+        }
+
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-2">Continue Shopping</a>
+        <a href="@Url.Action("GetUserOrders", "Order")" class="btn btn-secondary mt-2">View My Orders</a>
+    </div>
+</div>
+
+<script>
+    setTimeout(function () {
+        window.location.href = '@Url.Action("Index", "Home")';
+    }, 5000); // Redirect to home after 5 seconds
+</script>
+
+
+
+
+@* @{
+    ViewData["Title"] = "Order Success";
+}
+
+<div class="container mt-5">
+    <div class="alert alert-success text-center">
+        <h2>🎉 Order Placed Successfully!</h2>
         <p>Your order has been placed successfully. Thank you for shopping with us!</p>
         <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Continue Shopping</a>
         <a href="@Url.Action("GetUserOrders", "Order")" class="btn btn-secondary">View My Orders</a>
     </div>
 </div>
+ *@

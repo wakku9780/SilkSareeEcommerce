@@ -16,7 +16,12 @@
         public string ExistingAddress { get; set; }
 
         // ✅ For Dropdown
-        public List<string> SavedAddresses { get; set; }
+        public List<SavedAddressDto> SavedAddresses { get; set; }
+
+
+
+        // ✅ Bind selected saved address
+        public string SelectedSavedAddress { get; set; }
     }
 
 }
