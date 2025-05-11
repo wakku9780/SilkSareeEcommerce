@@ -14,6 +14,12 @@ namespace SilkSareeEcommerce.Repositories
 
         Task<Order> GetOrderWithDetailsAsync(int orderId);
 
+        Task<Order?> GetOrderByUserAndProductAsync(string userId, int productId);
+
+        Task<bool> HasUserPurchasedProductAsync(string userId, int productId);
+
+
+
 
     }
 }

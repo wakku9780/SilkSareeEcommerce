@@ -161,19 +161,38 @@ namespace SilkSareeEcommerce.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [AllowAnonymous]
-        [HttpGet("Product/Details/{id}")]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int productId)
         {
-            var product = await _productService.GetProductByIdAsync(id);
+            if (productId <= 0)
+            {
+                TempData["Error"] = "Invalid Product ID!";
+                return RedirectToAction("Index");
+            }
 
+            var product = await _productService.GetProductByIdAsync(productId);
             if (product == null)
             {
-                return NotFound();
+                TempData["Error"] = "Product not found!";
+                return RedirectToAction("Index");
             }
 
             return View(product);
         }
+
+
+        //[AllowAnonymous]
+        //[HttpGet("Product/Details/{id}")]
+        //public async Task<IActionResult> Details(int id)
+        //{
+        //    var product = await _productService.GetProductByIdAsync(id);
+
+        //    if (product == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(product);
+        //}
 
         // 🛒 ✅ ADD TO CART METHOD
         [HttpPost]

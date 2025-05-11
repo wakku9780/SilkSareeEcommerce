@@ -1,0 +1,16 @@
+﻿@model List<SilkSareeEcommerce.Models.ProductReview>
+
+<h2>Product Reviews</h2>
+@foreach (var review in Model)
+{
+    <p>@review.Comment - @review.Rating stars</p>
+}
+
+<h3>Add a Review</h3>
+<form asp-action="AddReview" method="post">
+    <label>Rating:</label>
+    <input type="number" name="Rating" min="1" max="5" required />
+    <label>Comment:</label>
+    <input type="text" name="Comment" required />
+    <button type="submit">Submit</button>
+</form>

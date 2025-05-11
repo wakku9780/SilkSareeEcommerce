@@ -134,6 +134,21 @@ namespace SilkSareeEcommerce.Repositories
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
+        public async Task<Order?> GetOrderByUserAndProductAsync(string userId, int productId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.UserId == userId && o.OrderItems.Any(oi => oi.ProductId == productId));
+        }
+
+
+        public async Task<bool> HasUserPurchasedProductAsync(string userId, int productId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                .AnyAsync(o => o.UserId == userId && o.OrderItems.Any(oi => oi.ProductId == productId));
+        }
+
 
 
 

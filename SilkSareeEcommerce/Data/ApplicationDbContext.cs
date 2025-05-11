@@ -19,6 +19,8 @@ namespace SilkSareeEcommerce.Data
         public DbSet<Payment> Payments { get; set; }    // ✅ Payment transactions ke liye
         public DbSet<Contact> Contacts { get; set; }
 
+        public DbSet<ProductReview> ProductReviews { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

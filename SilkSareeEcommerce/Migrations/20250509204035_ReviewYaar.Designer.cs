@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SilkSareeEcommerce.Data;
 
@@ -11,9 +12,11 @@ using SilkSareeEcommerce.Data;
 namespace SilkSareeEcommerce.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250509204035_ReviewYaar")]
+    partial class ReviewYaar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -477,10 +480,6 @@ namespace SilkSareeEcommerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
@@ -669,13 +668,11 @@ namespace SilkSareeEcommerce.Migrations
 
             modelBuilder.Entity("SilkSareeEcommerce.Models.ProductReview", b =>
                 {
-                    b.HasOne("SilkSareeEcommerce.Models.Product", "Product")
+                    b.HasOne("SilkSareeEcommerce.Models.Product", null)
                         .WithMany("Reviews")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("SilkSareeEcommerce.Models.Wishlist", b =>

@@ -1,0 +1,26 @@
+﻿@model SilkSareeEcommerce.Models.Product
+
+<h2>@Model.Name</h2>
+<p>@Model.Description</p>
+<p>Price: @Model.Price</p>
+
+<!-- Review Button -->
+<a asp-action="Index" asp-controller="ProductReview" asp-route-productId="@Model.Id" class="btn btn-primary">Add Review</a>
+
+<!-- Display Existing Reviews -->
+<h3>Product Reviews:</h3>
+@if (Model.Reviews != null && Model.Reviews.Any())
+{
+    <ul>
+        @foreach (var review in Model.Reviews)
+        {
+            <li>
+                <strong>@review.UserName:</strong> @review.Comment (Rating: @review.Rating Stars)
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No reviews yet. Be the first to add one!</p>
+}

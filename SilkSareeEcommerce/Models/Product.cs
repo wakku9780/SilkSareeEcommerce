@@ -37,5 +37,11 @@ namespace SilkSareeEcommerce.Models
 
         [Timestamp]
         public byte[] RowVersion { get; set; } // ⚠️ This is important
+
+        public ICollection<ProductReview> Reviews { get; set; } = new List<ProductReview>();
+
+        // Add average rating to Product
+        public decimal AverageRating { get; set; }
+
     }
 }

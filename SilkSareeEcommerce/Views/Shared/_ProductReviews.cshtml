@@ -1,0 +1,19 @@
+﻿@* <!-- _ProductReviews.cshtml -->
+@model List<ProductReview>
+
+@if (Model.Any())
+{
+    foreach (var review in Model)
+    {
+        <div>
+            <strong>@review.UserName</strong> - @review.Rating/5
+            <p>@review.ReviewText</p>
+            <small>@review.CreatedDate</small>
+        </div>
+    }
+}
+else
+{
+    <p>No reviews yet.</p>
+}
+ *@

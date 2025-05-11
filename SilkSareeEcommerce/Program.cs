@@ -45,6 +45,8 @@ builder.Services.AddScoped<IWishlistRepository,WishlistRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserOrderRepository, UserOrderRepository>();
 
+builder.Services.AddScoped<IProductReviewRepository, ProductReviewRepository>();
+builder.Services.AddScoped<ProductReviewService>();
 
 
 

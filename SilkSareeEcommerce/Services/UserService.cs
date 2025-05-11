@@ -16,6 +16,16 @@ namespace SilkSareeEcommerce.Services
             _userRepository = userRepository;
         }
 
+        public async Task<bool> IsVerifiedBuyerAsync(string userId, int productId)
+        {
+            // Check if the user has purchased the product (implement this logic as per your app's requirements)
+            var order = await _context.Orders
+                .FirstOrDefaultAsync(o => o.UserId == userId && o.OrderItems.Any(oi => oi.ProductId == productId));
+
+            return order != null;  // If a relevant order exists, the user is a verified buyer
+        }
+
+
         public async Task<List<ApplicationUser>> GetAllUsersAsync()
         {
             return await _context.Users.ToListAsync();
