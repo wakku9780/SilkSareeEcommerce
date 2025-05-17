@@ -43,5 +43,8 @@ namespace SilkSareeEcommerce.Models
         // Add average rating to Product
         public decimal AverageRating { get; set; }
 
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
+
+
     }
 }

@@ -1,72 +1,88 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using SilkSareeEcommerce.Models;
 using SilkSareeEcommerce.Services;
-using System.Security.Claims;
 
 namespace SilkSareeEcommerce.Controllers
 {
     public class ProductReviewController : Controller
     {
-        private readonly ProductReviewService _productReviewService;
+        private readonly ProductReviewService _reviewService;
 
-        public ProductReviewController(ProductReviewService productReviewService)
+        public ProductReviewController(ProductReviewService reviewService)
         {
-            _productReviewService = productReviewService;
+            _reviewService = reviewService;
         }
 
-        //public async Task<IActionResult> Index(int productId)
-        //{
-        //    var reviews = await _productReviewService.GetReviewsAsync(productId);
-        //    return View(reviews);
-        //}
-
-        public async Task<IActionResult> Index(int productId)
+        // ✅ Get All Purchased Products for Review
+        public async Task<IActionResult> Index()
         {
-            var reviews = await _productReviewService.GetReviewsAsync(productId);
-            ViewBag.ProductId = productId;  // Pass the ProductId to the view
-            return View(reviews);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            // Get logged-in user ID
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var purchasedProducts = await _reviewService.GetPurchasedProductsByUserAsync(userId);
+
+            if (purchasedProducts == null || !purchasedProducts.Any())
+            {
+                ViewBag.Message = "You have not purchased any products yet.";
+                return View(new List<Product>());  // Return empty list
+            }
+
+            // Debugging product details
+            foreach (var product in purchasedProducts)
+            {
+                Console.WriteLine($"Product ID: {product.Id}, Name: {product.Name}");
+            }
+
+            return View("Index", purchasedProducts);
         }
+
+
 
         [HttpGet]
-        public IActionResult AddReview(int productId)
+        public IActionResult Add(int productId)
         {
-            ViewData["ProductId"] = productId;
-            return View();
+            var model = new ProductReview
+            {
+                ProductId = productId
+            };
+            return View(model);
         }
+
+
 
         [HttpPost]
-        public async Task<IActionResult> AddReview(ProductReview review)
+        public async Task<IActionResult> Add(ProductReview model)
         {
-            // Check if the ProductId is correctly received
-            if (review.ProductId == 0)
-            {
-                ModelState.AddModelError("", "Invalid Product ID.");
-                return View(review);
-            }
-
-            // Set UserId from the logged-in user
-            review.UserId = User.Identity.Name ?? "Anonymous";
-
             if (ModelState.IsValid)
             {
-                try
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userName = User.Identity.Name;
+
+                var review = new ProductReview
                 {
-                    await _productReviewService.AddReviewAsync(review);
-                    return RedirectToAction("ProductDetails", "Product", new { id = review.ProductId });
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error while adding review: " + ex.Message);
-                }
+                    Rating = model.Rating,
+                    Comment = model.Comment,
+                    ProductId = model.ProductId,
+                    UserId = userId,
+                    UserName = userName,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _reviewService.AddReviewAsync(review);
+                return RedirectToAction("Index", new { productId = model.ProductId });
             }
 
-            return View(review);
+            return View(model);
         }
-
-
 
     }
 }
+
 
 
 

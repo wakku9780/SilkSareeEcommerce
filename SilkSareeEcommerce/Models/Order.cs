@@ -22,5 +22,8 @@ namespace SilkSareeEcommerce.Models
         [ForeignKey("ShippingAddressId")]
         public SavedAddress ShippingAddress { get; set; }
 
+        public ICollection<Product> Products { get; set; } = new List<Product>();
+
+
     }
 }

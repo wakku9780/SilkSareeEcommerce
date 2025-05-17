@@ -21,6 +21,8 @@ namespace SilkSareeEcommerce.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation Property to link with Product
-        public Product Product { get; set; }
+        public Product? Product { get; set; }
+        public int OrderId { get; set; }  // Link to the Order table
+
     }
 }

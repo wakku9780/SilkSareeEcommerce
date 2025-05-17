@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using SilkSareeEcommerce.Data;
+﻿using SilkSareeEcommerce.Data;
 using SilkSareeEcommerce.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace SilkSareeEcommerce.Repositories
 {
@@ -14,33 +13,115 @@ namespace SilkSareeEcommerce.Repositories
             _context = context;
         }
 
-        public async Task<List<ProductReview>> GetReviewsByProductIdAsync(int productId)
+        //public async Task<IEnumerable<Product>> GetPurchasedProductsByUserAsync(string userId)
+        //{
+        //    return (IEnumerable<Product>)await _context.Orders
+        //        .Where(o => o.UserId == userId)
+        //        .Include(o => o.Products)
+        //        .ThenInclude(p => p.Reviews)  // 👈 Include related reviews
+        //        .Select(o => o.Products)
+        //        .Distinct()
+        //        .ToListAsync();
+        //}
+
+
+        public async Task<IEnumerable<Product>> GetPurchasedProductsByUserAsync(string userId)
         {
-            return await _context.ProductReviews
-                .Where(r => r.ProductId == productId)
-                .ToListAsync();
+            // Fetch orders including products
+
+
+
+            var orders = await _context.Orders
+        .Include(o => o.OrderItems)        // Include OrderItems
+            .ThenInclude(oi => oi.Product)  // Include Product within OrderItems
+        .Where(o => o.UserId == userId)
+        .ToListAsync();
+
+            var products = orders
+                .SelectMany(o => o.OrderItems.Select(oi => oi.Product))  // Flatten the products from OrderItems
+                .DistinctBy(p => p.Id)   // Ensure unique products
+                .ToList();
+
+            foreach (var product in products)
+            {
+                product.Reviews = await _context.ProductReviews
+                    .Where(r => r.ProductId == product.Id)
+                    .ToListAsync();
+            }
+
+            return products;
+            //      var orders = await _context.Orders
+            //.Where(o => o.UserId == userId)
+            //.Select(o => new
+            //{
+            //    o.Id,
+            //    o.UserId,
+            //    Products = o.OrderItems.Select(oi => oi.Product).ToList()
+            //})
+            //.ToListAsync();
+
+
+
+            //      var products = orders
+            //  .SelectMany(o => o.Products)
+            //  .DistinctBy(p => p.Id)
+            //  .ToList();
+
+
+            //      // Attach reviews to each product
+            //      foreach (var product in products)
+            //      {
+            //          product.Reviews = await _context.ProductReviews
+            //              .Where(r => r.ProductId == product.Id)
+            //              .ToListAsync();
+            //      }
+
+            //      return products;
         }
 
-        public async Task<ProductReview?> AddReviewAsync(ProductReview review)
+
+
+
+
+
+        //public async Task<IEnumerable<Product>> GetPurchasedProductsByUserAsync(string userId)
+        //{
+        //    return await _context.Products
+        //        .Include(p => p.Reviews)
+        //        .Where(p => p.Orders.Any(o => o.UserId == userId)) // Check if the product was ordered by the user
+        //        .ToListAsync();
+        //}
+
+        public async Task<IEnumerable<ProductReview>> GetReviewsAsync(int productId)
+        {
+            return await _context.ProductReviews
+                                 .Where(r => r.ProductId == productId)
+                                 .ToListAsync();
+        }
+
+        public async Task<bool> IsVerifiedBuyerAsync(string userId, int productId)
+        {
+            return await _context.Orders
+                .AnyAsync(o => o.UserId == userId && o.OrderItems.Any(oi => oi.ProductId == productId));
+        }
+
+        public async Task AddReviewAsync(ProductReview review)
         {
             _context.ProductReviews.Add(review);
             await _context.SaveChangesAsync();
-            return review;
         }
 
-        public async Task<bool> DeleteReviewAsync(int reviewId)
+        public async Task DeleteReviewAsync(int id)
         {
-            var review = await _context.ProductReviews.FindAsync(reviewId);
-            if (review == null) return false;
-
-            _context.ProductReviews.Remove(review);
-            await _context.SaveChangesAsync();
-            return true;
+            var review = await _context.ProductReviews.FindAsync(id);
+            if (review != null)
+            {
+                _context.ProductReviews.Remove(review);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
-
-
 
 
 //using SilkSareeEcommerce.Data;

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SilkSareeEcommerce.Data;
 
@@ -11,9 +12,11 @@ using SilkSareeEcommerce.Data;
 namespace SilkSareeEcommerce.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250517114423_llll")]
+    partial class llll
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,7 +170,7 @@ namespace SilkSareeEcommerce.Migrations
 
                     b.HasIndex("ProductsId");
 
-                    b.ToTable("OrderProducts", (string)null);
+                    b.ToTable("OrderProduct");
                 });
 
             modelBuilder.Entity("SilkSareeEcommerce.Models.ApplicationUser", b =>

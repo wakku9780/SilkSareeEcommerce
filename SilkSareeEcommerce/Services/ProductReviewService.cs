@@ -5,31 +5,50 @@ namespace SilkSareeEcommerce.Services
 {
     public class ProductReviewService
     {
-        private readonly IProductReviewRepository _reviewRepository;
+        private readonly IProductReviewRepository _repository;
 
-        public ProductReviewService(IProductReviewRepository reviewRepository)
+        public ProductReviewService(IProductReviewRepository repository)
         {
-            _reviewRepository = reviewRepository;
+            _repository = repository;
         }
 
-        public async Task<List<ProductReview>> GetReviewsAsync(int productId)
+        public async Task<IEnumerable<Product>> GetPurchasedProductsByUserAsync(string userId)
         {
-            return await _reviewRepository.GetReviewsByProductIdAsync(productId);
+            return await _repository.GetPurchasedProductsByUserAsync(userId);
         }
 
-        public async Task<ProductReview?> AddReviewAsync(ProductReview review)
-        {
 
-            if (review.ProductId == 0)
-            {
-                throw new ArgumentException("Product ID cannot be zero.");
-            }
-            return await _reviewRepository.AddReviewAsync(review);
+        public async Task<IEnumerable<ProductReview>> GetReviewsAsync(int productId)
+        {
+            return await _repository.GetReviewsAsync(productId);
         }
 
-        public async Task<bool> DeleteReviewAsync(int reviewId)
+        //public async Task<bool> AddReviewAsync(ProductReview review)
+        //{
+        //    var isVerified = await _repository.IsVerifiedBuyerAsync(review.UserId, review.ProductId);
+        //    if (isVerified)
+        //    {
+        //        await _repository.AddReviewAsync(review);
+        //        return true;
+        //    }
+        //    return false;
+        //}
+
+        public async Task DeleteReviewAsync(int id)
         {
-            return await _reviewRepository.DeleteReviewAsync(reviewId);
+            await _repository.DeleteReviewAsync(id);
+        }
+
+        // ✅ Get purchased products for the current user
+        public async Task<IEnumerable<Product>> GetPurchasedProductsAsync(string userId)
+        {
+            return await _repository.GetPurchasedProductsByUserAsync(userId);
+        }
+
+        // ✅ Add a new review
+        public async Task AddReviewAsync(ProductReview review)
+        {
+            await _repository.AddReviewAsync(review);
         }
     }
 }

@@ -1,0 +1,91 @@
+﻿@model SilkSareeEcommerce.Models.ProductReview
+
+<h2>Add Review</h2>
+
+<form asp-action="Add" method="post">
+    @* CSRF Token for form security *@
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="ProductId" />
+
+    <div class="form-group">
+        <label asp-for="Rating">Rating</label>
+        <input type="number" asp-for="Rating" min="1" max="5" class="form-control" />
+        <span asp-validation-for="Rating" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Comment">Comment</label>
+        <textarea asp-for="Comment" class="form-control"></textarea>
+        <span asp-validation-for="Comment" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@section Scripts {
+    @* Client-side validation *@
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+
+
+
+@* @model SilkSareeEcommerce.Models.ProductReview
+
+<h2>Add Review</h2>
+
+<form asp-action="Add" method="post">
+    <input type="hidden" asp-for="ProductId" />
+    <div class="form-group">
+        <label asp-for="Rating">Rating</label>
+        <input type="number" asp-for="Rating" min="1" max="5" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Comment">Comment</label>
+        <textarea asp-for="Comment" class="form-control"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+ *@
+
+@*  @model SilkSareeEcommerce.Models.ProductReview
+
+<h2>Add/Edit Review</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form asp-action="Add" method="post" class="form-group">
+    @* CSRF Token to prevent 405 error *@
+   @*  @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="ProductId" value="@ViewBag.ProductId" />
+
+    <div class="form-group">
+        <label for="Rating">Rating (1-5)</label>
+        <select asp-for="Rating" class="form-control">
+            @for (int i = 1; i <= 5; i++)
+            {
+                <option value="@i">@i Star</option>
+            }
+        </select>
+        <span asp-validation-for="Rating" class="text-danger"></span>
+    </div> *@
+
+@*     <div class="form-group">
+        <label for="Comment">Comment</label>
+        <textarea asp-for="Comment" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Comment" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Submit</button>
+</form>
+
+  *@ 

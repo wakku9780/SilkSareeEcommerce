@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Reflection.Emit;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SilkSareeEcommerce.Models;
@@ -25,11 +26,41 @@ namespace SilkSareeEcommerce.Data
         {
             base.OnModelCreating(builder);
 
+
+            builder.Entity<Product>()
+         .HasMany(p => p.Orders)
+         .WithMany(o => o.Products); // Many-to-Many relationship
+
+
+            builder.Entity<Order>()
+        .HasMany(o => o.Products)
+        .WithMany(p => p.Orders)
+        .UsingEntity(j => j.ToTable("OrderProducts"));  // Many-to-many relationship
+
+
+
             // OrderItem relationship
             builder.Entity<OrderItem>()
                 .HasOne(o => o.Order)
                 .WithMany(o => o.OrderItems)
                 .HasForeignKey(o => o.OrderId);
+
+
+
+            // Order entity configuration
+            builder.Entity<Order>()
+                .HasMany(o => o.OrderItems)
+                .WithOne(oi => oi.Order)
+                .HasForeignKey(oi => oi.OrderId);
+
+            // OrderItem to Product mapping
+            builder.Entity<OrderItem>()
+                .HasOne(oi => oi.Product)
+                .WithMany()
+                .HasForeignKey(oi => oi.ProductId);
+
+
+
 
             // CartItem relationship
             builder.Entity<CartItem>()
