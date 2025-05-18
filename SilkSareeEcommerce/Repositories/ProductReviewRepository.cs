@@ -92,6 +92,17 @@ namespace SilkSareeEcommerce.Repositories
         //        .ToListAsync();
         //}
 
+
+        public async Task<bool> HasPurchasedProductAsync(Guid userId, int productId)
+        {
+
+            string userIdString = userId.ToString();
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                .AnyAsync(o => o.UserId == userIdString && o.OrderItems.Any(oi => oi.ProductId == productId));
+        }
+
+
         public async Task<IEnumerable<ProductReview>> GetReviewsAsync(int productId)
         {
             return await _context.ProductReviews

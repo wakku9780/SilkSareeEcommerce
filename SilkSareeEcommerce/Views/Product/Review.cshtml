@@ -1,0 +1,45 @@
+﻿@model IEnumerable<SilkSareeEcommerce.Models.Product>
+
+<h2>Purchased Products</h2>
+
+@if (Model.Any())
+{
+    <ul class="list-group">
+        @foreach (var product in Model)
+        {
+            <li class="list-group-item">
+                <h3>@product.Name</h3>
+                <p>@product.Description</p>
+                <p>Price: @product.Price</p>
+
+                <h4>Product Reviews</h4>
+                @if (product.Reviews != null && product.Reviews.Any())
+                {
+                    <ul>
+                        @foreach (var review in product.Reviews)
+                        {
+                            <li>
+                                Rating: @review.Rating, Comment: @review.Comment, By: @review.UserName
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No reviews yet. Be the first to add one!</p>
+                }
+
+                <a asp-action="Add" asp-controller="ProductReview"
+                   asp-route-productId="@product.Id"
+                   class="btn btn-primary mt-3">Write Review</a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <div class="alert alert-warning">
+        No purchased products found. Please buy some products to review them.
+    </div>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-primary">Go to Home</a>
+}

@@ -9,6 +9,10 @@ namespace SilkSareeEcommerce.Repositories
         Task AddReviewAsync(ProductReview review);
         Task DeleteReviewAsync(int id);
         Task<IEnumerable<Product>> GetPurchasedProductsByUserAsync(string userId);
+        Task<bool> HasPurchasedProductAsync(Guid userId, int productId);
+
+         
+
 
     }
 }

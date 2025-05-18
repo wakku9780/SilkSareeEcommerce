@@ -18,6 +18,12 @@ namespace SilkSareeEcommerce.Services
         }
 
 
+
+        public async Task<bool> CanUserReviewAsync(Guid userId, int productId)
+        {
+            return await _repository.HasPurchasedProductAsync(userId, productId);
+        }
+
         public async Task<IEnumerable<ProductReview>> GetReviewsAsync(int productId)
         {
             return await _repository.GetReviewsAsync(productId);
@@ -50,6 +56,18 @@ namespace SilkSareeEcommerce.Services
         {
             await _repository.AddReviewAsync(review);
         }
+
+        public async Task<decimal> GetAverageRatingAsync(int productId)
+        {
+            var reviews = await _repository.GetReviewsAsync(productId);
+
+            if (reviews == null || !reviews.Any())
+                return 0;
+
+            // Calculate average rating
+            return (decimal)reviews.Average(r => r.Rating);
+        }
+
     }
 }
 

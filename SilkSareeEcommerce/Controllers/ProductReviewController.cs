@@ -1,4 +1,103 @@
-﻿using System.Security.Claims;
+﻿//using System.Security.Claims;
+//using Microsoft.AspNetCore.Mvc;
+//using SilkSareeEcommerce.Models;
+//using SilkSareeEcommerce.Services;
+
+//namespace SilkSareeEcommerce.Controllers
+//{
+//    public class ProductReviewController : Controller
+//    {
+//        private readonly ProductReviewService _reviewService;
+//        private readonly IHttpContextAccessor _httpContextAccessor;
+
+//        public ProductReviewController(ProductReviewService reviewService, IHttpContextAccessor httpContextAccessor)
+//        {
+//            _reviewService = reviewService;
+//            _httpContextAccessor = httpContextAccessor;
+//        }
+
+//        // ✅ Get All Reviews for a Specific Product
+//        [HttpGet]
+//        public async Task<IActionResult> Index(int productId)
+//        {
+//            var reviews = await _reviewService.GetReviewsAsync(productId);
+
+//            if (reviews == null || !reviews.Any())
+//            {
+//                ViewBag.Message = "No reviews available for this product.";
+//                return View(new List<ProductReview>());
+//            }
+
+//            return View("Index", reviews);
+//        }
+
+//        // ✅ Get the Add Review Page
+//        [HttpGet]
+//        public async Task<IActionResult> Add(int productId)
+//        {
+//            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+//            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+//            {
+//                return RedirectToAction("Login", "Account");
+//            }
+
+//            // Check if the user has purchased the product
+//            var canReview = await _reviewService.CanUserReviewAsync(userId, productId);
+//            if (!canReview)
+//            {
+//                TempData["ErrorMessage"] = "You can only review products you have purchased.";
+//                return RedirectToAction("Index", "Product");
+//            }
+
+//            var model = new ProductReview
+//            {
+//                ProductId = productId
+//            };
+
+//            return View(model);
+//        }
+
+//        // ✅ Add Review to Database
+//        [HttpPost]
+//        public async Task<IActionResult> Add(ProductReview model)
+//        {
+//            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+//            var userName = User.Identity.Name;
+
+//            if (string.IsNullOrEmpty(userId) )
+//            {
+//                return RedirectToAction("Login", "Account");
+//            }
+
+//            if (ModelState.IsValid)
+//            {
+//                var review = new ProductReview
+//                {
+//                    Rating = model.Rating,
+//                    Comment = model.Comment,
+//                    ProductId = model.ProductId,
+//                    UserId = userId,
+//                    UserName = userName,
+//                    CreatedAt = DateTime.UtcNow
+//                };
+
+//                await _reviewService.AddReviewAsync(review);
+
+//                TempData["SuccessMessage"] = "Review added successfully!";
+//                return RedirectToAction("Index", "Product", new { productId = model.ProductId });
+//            }
+
+//            TempData["ErrorMessage"] = "Failed to add the review. Please try again.";
+//            return View(model);
+//        }
+//    }
+//}
+
+
+
+//important 
+
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using SilkSareeEcommerce.Models;
 using SilkSareeEcommerce.Services;
@@ -9,37 +108,67 @@ namespace SilkSareeEcommerce.Controllers
     {
         private readonly ProductReviewService _reviewService;
 
+
         public ProductReviewController(ProductReviewService reviewService)
         {
             _reviewService = reviewService;
         }
 
-        // ✅ Get All Purchased Products for Review
+        // ✅ Get Purchased Products and Their Reviews
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            // Get logged-in user ID
             if (string.IsNullOrEmpty(userId))
             {
                 return RedirectToAction("Login", "Account");
             }
 
             var purchasedProducts = await _reviewService.GetPurchasedProductsByUserAsync(userId);
+            foreach (var product in purchasedProducts)
+            {
+                product.AverageRating = await _reviewService.GetAverageRatingAsync(product.Id);
+            }
 
             if (purchasedProducts == null || !purchasedProducts.Any())
             {
                 ViewBag.Message = "You have not purchased any products yet.";
-                return View(new List<Product>());  // Return empty list
-            }
-
-            // Debugging product details
-            foreach (var product in purchasedProducts)
-            {
-                Console.WriteLine($"Product ID: {product.Id}, Name: {product.Name}");
+                return View(new List<Product>());
             }
 
             return View("Index", purchasedProducts);
         }
+
+
+        // ✅ Get All Purchased Products for Review
+        //public async Task<IActionResult> Index()
+        //{
+        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //    // Get logged-in user ID
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        return RedirectToAction("Login", "Account");
+        //    }
+
+        //    var purchasedProducts = await _reviewService.GetPurchasedProductsByUserAsync(userId);
+
+        //    if (purchasedProducts == null || !purchasedProducts.Any())
+        //    {
+        //        ViewBag.Message = "You have not purchased any products yet.";
+        //        return View(new List<Product>());  // Return empty list
+        //    }
+
+        //    // Debugging product details
+        //    foreach (var product in purchasedProducts)
+        //    {
+        //        Console.WriteLine($"Product ID: {product.Id}, Name: {product.Name}");
+        //    }
+
+        //    return View("Index", purchasedProducts);
+        //}
+
+
+
+
 
 
 

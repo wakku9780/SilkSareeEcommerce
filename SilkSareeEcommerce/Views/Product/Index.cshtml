@@ -100,6 +100,10 @@
                                     <a asp-controller="Wishlist" asp-action="Add" asp-route-productId="@product.Id" class="btn btn-warning btn-sm">
                                         <i class="fas fa-heart"></i> Add to Wishlist
                                     </a>
+
+                                    <a asp-action="Index" asp-controller="ProductReview"
+                                       asp-route-productId="@product.Id"
+                                       class="btn btn-primary mt-3">Review</a>
                                 }
                             </div>
                         </div>
