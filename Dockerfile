@@ -1,17 +1,21 @@
-# Stage 1: Build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+
+# Install wkhtmltox dependencies and wkhtmltopdf package (Linux version)
+RUN apt-get update && apt-get install -y \
+    wget \
+    xfonts-75dpi \
+    xfonts-base \
+    libjpeg62-turbo \
+    libxrender1 \
+    libxtst6 \
+    libssl-dev \
+    && wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb \
+    && dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb \
+    && apt-get install -f -y \
+    && rm wkhtmltox_0.12.6-1.bionic_amd64.deb
+
 WORKDIR /app
 
-# Copy the project file and restore dependencies
-COPY SilkSareeEcommerce/*.csproj ./
-RUN dotnet restore
+COPY . .
 
-# Copy the rest of the application files
-COPY . ./
-RUN dotnet publish -c Release -o out
-
-# Stage 2: Run
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
-WORKDIR /app
-COPY --from=build /app/out ./
 ENTRYPOINT ["dotnet", "SilkSareeEcommerce.dll"]
