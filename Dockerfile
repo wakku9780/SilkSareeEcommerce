@@ -49,7 +49,7 @@ RUN dotnet restore
 RUN dotnet publish -c Release -o out
 
 # Expose port (optional, if your app listens on this port)
-EXPOSE 80
+EXPOSE 8080
 
 # Set entrypoint to run the app
 ENTRYPOINT ["dotnet", "out/SilkSareeEcommerce.dll"]
