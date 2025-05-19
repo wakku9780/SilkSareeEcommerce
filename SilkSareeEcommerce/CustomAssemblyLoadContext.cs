@@ -1,34 +1,32 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Reflection;
 using System.Runtime.Loader;
+using System.IO;
 
 public class CustomAssemblyLoadContext : AssemblyLoadContext
 {
+    private IntPtr nativeLibraryPtr;
+
+    public CustomAssemblyLoadContext() : base(true)
+    {
+    }
+
     public IntPtr LoadUnmanagedLibrary(string absolutePath)
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            // Windows DLL
-            return LoadUnmanagedDllFromPath(absolutePath + "/libwkhtmltox.dll");
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            // Linux so file
-            return LoadUnmanagedDllFromPath(absolutePath + "/libwkhtmltox.so");
-        }
-        else
-        {
-            throw new PlatformNotSupportedException("Unsupported OS platform.");
-        }
+        nativeLibraryPtr = LoadUnmanagedDll(absolutePath);
+        return nativeLibraryPtr;
     }
 
-    protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
+    protected override IntPtr LoadUnmanagedDll(string unmanagedDllPath)
     {
-        // Optional: Implement if you want to load based on unmanagedDllName
-        return IntPtr.Zero;
+        return LoadUnmanagedDllFromPath(unmanagedDllPath);
+    }
+
+    protected override Assembly Load(AssemblyName assemblyName)
+    {
+        return null; // No managed assemblies to load here
     }
 }
-
 
 
 //using System.Reflection;
