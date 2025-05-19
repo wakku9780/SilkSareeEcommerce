@@ -291,3 +291,4 @@ async Task SeedRolesAndAdmin(IServiceProvider serviceProvider)
 //    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 //app.Run();
+
