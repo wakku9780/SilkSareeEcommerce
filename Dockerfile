@@ -31,9 +31,9 @@ RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkh
     && dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb || apt-get install -f -y \
     && rm wkhtmltox_0.12.6-1.bionic_amd64.deb
 
-# Install .NET SDK (you can update version here)
+# Install .NET 8.0 SDK
 RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
-    && bash dotnet-install.sh --channel 7.0 --install-dir /usr/share/dotnet \
+    && bash dotnet-install.sh --channel 8.0 --install-dir /usr/share/dotnet \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
     && rm dotnet-install.sh
 
