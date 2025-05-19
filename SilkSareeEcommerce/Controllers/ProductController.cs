@@ -20,7 +20,9 @@ namespace SilkSareeEcommerce.Controllers
         private readonly OrderService _orderService;
         private readonly UserService _userService;
 
-        public ProductController(OrderService orderService, PayPalService payPalService,ProductService productService, CategoryService categoryService, CloudinaryService cloudinaryService, CartService cartService, UserService userService)
+        private readonly ProductReviewService _reviewService;
+
+        public ProductController(ProductReviewService reviewService, OrderService orderService, PayPalService payPalService,ProductService productService, CategoryService categoryService, CloudinaryService cloudinaryService, CartService cartService, UserService userService)
         {
             _productService = productService;
             _categoryService = categoryService;
@@ -29,6 +31,7 @@ namespace SilkSareeEcommerce.Controllers
             _payPalService = payPalService;
             _orderService = orderService;
             _userService = userService;
+            _reviewService = reviewService;
         }
 
         //public async Task<IActionResult> Index()
@@ -38,12 +41,33 @@ namespace SilkSareeEcommerce.Controllers
         //}
 
 
-        public async Task<IActionResult> Index(string? name, int? categoryId, decimal? minPrice, decimal? maxPrice)
+        public async Task<IActionResult> Index(string name, int? categoryId, decimal? minPrice, decimal? maxPrice)
         {
             var products = await _productService.SearchProductsAsync(name, categoryId, minPrice, maxPrice);
-            ViewBag.Categories = await _productService.GetAllCategoriesAsync();  // for dropdown
+
+            foreach (var product in products)
+            {
+                var reviews = await _reviewService.GetAverageRatingAsync(product.Id);
+                // product.AverageRating = await _reviewService.GetAverageRatingAsync(product.Id);
+                // Directly get the average rating as a decimal
+                decimal? averageRating = await _reviewService.GetAverageRatingAsync(product.Id);
+
+                // Assign either the rating or 0 if null
+                product.AverageRating = averageRating ?? 0m;
+
+            }
+
+            ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
             return View(products);
         }
+
+
+        //public async Task<IActionResult> Index(string? name, int? categoryId, decimal? minPrice, decimal? maxPrice)
+        //{
+        //    var products = await _productService.SearchProductsAsync(name, categoryId, minPrice, maxPrice);
+        //    ViewBag.Categories = await _productService.GetAllCategoriesAsync();  // for dropdown
+        //    return View(products);
+        //}
 
 
 
@@ -161,38 +185,38 @@ namespace SilkSareeEcommerce.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Details(int productId)
-        {
-            if (productId <= 0)
-            {
-                TempData["Error"] = "Invalid Product ID!";
-                return RedirectToAction("Index");
-            }
-
-            var product = await _productService.GetProductByIdAsync(productId);
-            if (product == null)
-            {
-                TempData["Error"] = "Product not found!";
-                return RedirectToAction("Index");
-            }
-
-            return View(product);
-        }
-
-
-        //[AllowAnonymous]
-        //[HttpGet("Product/Details/{id}")]
-        //public async Task<IActionResult> Details(int id)
+        //public async Task<IActionResult> Details(int productId)
         //{
-        //    var product = await _productService.GetProductByIdAsync(id);
+        //    if (productId <= 0)
+        //    {
+        //        TempData["Error"] = "Invalid Product ID!";
+        //        return RedirectToAction("Index");
+        //    }
 
+        //    var product = await _productService.GetProductByIdAsync(productId);
         //    if (product == null)
         //    {
-        //        return NotFound();
+        //        TempData["Error"] = "Product not found!";
+        //        return RedirectToAction("Index");
         //    }
 
         //    return View(product);
         //}
+
+
+        [AllowAnonymous]
+        [HttpGet("Product/Details/{id}")]
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
+        }
 
         // 🛒 ✅ ADD TO CART METHOD
         [HttpPost]
@@ -353,19 +377,46 @@ namespace SilkSareeEcommerce.Controllers
         [HttpGet("BuyNow/{id}")]
         public async Task<IActionResult> BuyNow(int id)
         {
-            var product = await _productService.GetProductByIdAsync(id);
-            if (product == null)
-            {
-                return NotFound(); // Agar product nahi mila
-            }
 
-            // BuyNowViewModel create karo aur product ko set karo
-            var model = new BuyNowViewModel
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+
+            var totalAmount = cartItems.Sum(item => item.Product.Price * item.Quantity);
+            var savedAddresses = await _userService.GetSavedAddressesAsync(userId);
+
+            var checkoutViewModel = new CheckoutViewModel
             {
-                Product = product
+                CartItems = cartItems,
+                TotalAmount = totalAmount,
+                SavedAddresses = savedAddresses.Select((address, index) => new SavedAddressDto
+                {
+                    Id = index + 1, // agar real DB ID nahi hai
+                    Address = address
+                }).ToList()
             };
 
-            return View("BuyNow", model);  // Model ko pass karo
+
+
+
+
+            return View("BuyNow",checkoutViewModel);
+
+
+            //var product = await _productService.GetProductByIdAsync(id);
+            //if (product == null)
+            //{
+            //    return NotFound(); // Agar product nahi mila
+            //}
+
+            //// BuyNowViewModel create karo aur product ko set karo
+            //var model = new BuyNowViewModel
+            //{
+            //    Product = product
+            //};
+
+            //return View("BuyNow", model);  // Model ko pass karo
         }
 
 

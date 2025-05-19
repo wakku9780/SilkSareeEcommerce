@@ -70,8 +70,8 @@ else
                 success: function (response) {
                     if (response.success) {
                         $("#quantity-" + productId).text(response.newQuantity);
-                        $("#total-" + productId).text("$" + parseFloat(response.newTotal).toFixed(2)); // ✅ Update Product Total
-                        $("#cart-total").text("$" + parseFloat(response.cartTotal).toFixed(2)); // ✅ Update Cart Total
+                        $("#total-" + productId).text("₹" + parseFloat(response.newTotal).toFixed(2)); // ✅ Update Product Total
+                        $("#cart-total").text("₹" + parseFloat(response.cartTotal).toFixed(2)); // ✅ Update Cart Total
                     } else {
                         alert(response.message); // Error handling
                     }
@@ -93,7 +93,7 @@ else
                     data: { productId: productId },
                     success: function (response) {
                         $("#row-" + productId).remove();
-                        $("#cart-total").text("$" + parseFloat(response.cartTotal).toFixed(2)); // ✅ Update Cart Total
+                        $("#cart-total").text("₹" + parseFloat(response.cartTotal).toFixed(2)); // ✅ Update Cart Total
                     },
                     error: function () {
                         alert("Failed to remove item. Please try again.");

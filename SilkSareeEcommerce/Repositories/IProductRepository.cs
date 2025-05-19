@@ -22,6 +22,9 @@ namespace SilkSareeEcommerce.Repositories
 
         Task<List<Product>> SearchProductsAsync(string? name, int? categoryId, decimal? minPrice, decimal? maxPrice);
 
+        Task UpdateAverageRating(int productId, double averageRating);
+
+
     }
 
 }

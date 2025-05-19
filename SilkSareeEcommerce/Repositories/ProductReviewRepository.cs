@@ -131,6 +131,16 @@ namespace SilkSareeEcommerce.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public Task<IEnumerable<ProductReview>> GetByProductIdAsync(int productId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddAsync(ProductReview review)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

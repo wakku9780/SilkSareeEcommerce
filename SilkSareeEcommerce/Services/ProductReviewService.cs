@@ -6,10 +6,12 @@ namespace SilkSareeEcommerce.Services
     public class ProductReviewService
     {
         private readonly IProductReviewRepository _repository;
+        private readonly IProductRepository _productRepository;
 
-        public ProductReviewService(IProductReviewRepository repository)
+        public ProductReviewService(IProductReviewRepository repository, IProductRepository productRepository)
         {
             _repository = repository;
+            _productRepository = productRepository;
         }
 
         public async Task<IEnumerable<Product>> GetPurchasedProductsByUserAsync(string userId)
@@ -67,6 +69,16 @@ namespace SilkSareeEcommerce.Services
             // Calculate average rating
             return (decimal)reviews.Average(r => r.Rating);
         }
+
+          public async Task UpdateAverageRatingAsync(int productId)
+    {
+        var reviews = await _repository.GetByProductIdAsync(productId);
+        if (reviews != null && reviews.Any())
+        {
+            var averageRating = reviews.Average(r => r.Rating);
+            await _productRepository.UpdateAverageRating(productId, averageRating);
+        }
+    }
 
     }
 }

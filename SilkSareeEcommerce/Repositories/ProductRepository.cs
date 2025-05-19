@@ -65,6 +65,17 @@ namespace SilkSareeEcommerce.Repositories
         }
 
 
+        public async Task UpdateAverageRating(int productId, double averageRating)
+        {
+            var product = await _context.Products.FindAsync(productId);
+            if (product != null)
+            {
+                product.AverageRating = (decimal)averageRating;
+                _context.Products.Update(product);
+                await _context.SaveChangesAsync();
+            }
+        }
+
 
 
         public async Task<List<Category>> GetAllCategoriesAsync()

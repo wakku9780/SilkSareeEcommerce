@@ -8,69 +8,57 @@
 //    public class ProductReviewController : Controller
 //    {
 //        private readonly ProductReviewService _reviewService;
-//        private readonly IHttpContextAccessor _httpContextAccessor;
 
-//        public ProductReviewController(ProductReviewService reviewService, IHttpContextAccessor httpContextAccessor)
+//        public ProductReviewController(ProductReviewService reviewService)
 //        {
 //            _reviewService = reviewService;
-//            _httpContextAccessor = httpContextAccessor;
 //        }
 
-//        // ✅ Get All Reviews for a Specific Product
-//        [HttpGet]
-//        public async Task<IActionResult> Index(int productId)
+//        // ✅ Get Purchased Products and Their Reviews with Average Rating
+//        public async Task<IActionResult> Index()
 //        {
-//            var reviews = await _reviewService.GetReviewsAsync(productId);
-
-//            if (reviews == null || !reviews.Any())
-//            {
-//                ViewBag.Message = "No reviews available for this product.";
-//                return View(new List<ProductReview>());
-//            }
-
-//            return View("Index", reviews);
-//        }
-
-//        // ✅ Get the Add Review Page
-//        [HttpGet]
-//        public async Task<IActionResult> Add(int productId)
-//        {
-//            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-//            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+//            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+//            if (string.IsNullOrEmpty(userId))
 //            {
 //                return RedirectToAction("Login", "Account");
 //            }
 
-//            // Check if the user has purchased the product
-//            var canReview = await _reviewService.CanUserReviewAsync(userId, productId);
-//            if (!canReview)
+//            var purchasedProducts = await _reviewService.GetPurchasedProductsByUserAsync(userId);
+//            if (purchasedProducts == null || !purchasedProducts.Any())
 //            {
-//                TempData["ErrorMessage"] = "You can only review products you have purchased.";
-//                return RedirectToAction("Index", "Product");
+//                ViewBag.Message = "You have not purchased any products yet.";
+//                return View(new List<Product>());
 //            }
 
+//            // 🔥 Calculate and Assign Average Rating to Each Product
+//            foreach (var product in purchasedProducts)
+//            {
+//                product.AverageRating = await _reviewService.GetAverageRatingAsync(product.Id);
+//            }
+
+//            return View("Index", purchasedProducts);
+//        }
+
+//        // ✅ Display Add Review Form
+//        [HttpGet]
+//        public IActionResult Add(int productId)
+//        {
 //            var model = new ProductReview
 //            {
 //                ProductId = productId
 //            };
-
 //            return View(model);
 //        }
 
-//        // ✅ Add Review to Database
+//        // ✅ Submit a New Review
 //        [HttpPost]
 //        public async Task<IActionResult> Add(ProductReview model)
 //        {
-//            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-//            var userName = User.Identity.Name;
-
-//            if (string.IsNullOrEmpty(userId) )
-//            {
-//                return RedirectToAction("Login", "Account");
-//            }
-
 //            if (ModelState.IsValid)
 //            {
+//                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+//                var userName = User.Identity?.Name ?? "Anonymous";
+
 //                var review = new ProductReview
 //                {
 //                    Rating = model.Rating,
@@ -83,16 +71,16 @@
 
 //                await _reviewService.AddReviewAsync(review);
 
-//                TempData["SuccessMessage"] = "Review added successfully!";
-//                return RedirectToAction("Index", "Product", new { productId = model.ProductId });
+//                // ✅ Update Average Rating after adding the review
+//                await _reviewService.UpdateAverageRatingAsync(model.ProductId);
+
+//                return RedirectToAction("Index", new { productId = model.ProductId });
 //            }
 
-//            TempData["ErrorMessage"] = "Failed to add the review. Please try again.";
 //            return View(model);
 //        }
 //    }
 //}
-
 
 
 //important 
@@ -107,6 +95,7 @@ namespace SilkSareeEcommerce.Controllers
     public class ProductReviewController : Controller
     {
         private readonly ProductReviewService _reviewService;
+
 
 
         public ProductReviewController(ProductReviewService reviewService)

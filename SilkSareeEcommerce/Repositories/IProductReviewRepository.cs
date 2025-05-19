@@ -11,7 +11,13 @@ namespace SilkSareeEcommerce.Repositories
         Task<IEnumerable<Product>> GetPurchasedProductsByUserAsync(string userId);
         Task<bool> HasPurchasedProductAsync(Guid userId, int productId);
 
-         
+        // Task UpdateAverageRating(int productId, double averageRating);
+
+        Task<IEnumerable<ProductReview>> GetByProductIdAsync(int productId);
+        Task AddAsync(ProductReview review);
+
+
+
 
 
     }
