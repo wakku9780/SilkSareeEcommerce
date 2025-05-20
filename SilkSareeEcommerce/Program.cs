@@ -29,7 +29,7 @@ builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
-    new MySqlServerVersion(new Version(8, 0, 34)))); // ya 5.7 agar FreeSQL MySQL 5.7 hai
+    new MySqlServerVersion(new Version(8, 0, 36)))); // ya 5.7 agar FreeSQL MySQL 5.7 hai
 
 
 // Add Identity services
