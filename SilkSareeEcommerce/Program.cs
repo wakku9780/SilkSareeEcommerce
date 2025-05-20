@@ -24,8 +24,13 @@ builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new 
 
 
 // Add DbContext using connection string from configuration
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+    new MySqlServerVersion(new Version(8, 0, 34)))); // ya 5.7 agar FreeSQL MySQL 5.7 hai
+
 
 // Add Identity services
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
