@@ -23,13 +23,13 @@ context.LoadUnmanagedLibrary(wkhtmltoxPath);
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
 
-// Add DbContext using connection string from configuration
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
-
+//Add DbContext using connection string from configuration
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
-    new MySqlServerVersion(new Version(8, 0, 36)))); // ya 5.7 agar FreeSQL MySQL 5.7 hai
+    options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
+
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+//    new MySqlServerVersion(new Version(8, 0, 36)))); // ya 5.7 agar FreeSQL MySQL 5.7 hai
 
 
 // Add Identity services
