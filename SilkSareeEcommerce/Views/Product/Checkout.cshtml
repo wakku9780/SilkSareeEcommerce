@@ -35,7 +35,24 @@
     </tbody>
 </table>
 
-<h4>Total: @Model.TotalAmount.ToString("C")</h4>
+@{
+    var subtotal = Model.TotalAmount + Model.DiscountAmount;
+}
+
+<h4>Subtotal: ₹@subtotal</h4>
+
+@if (Model.DiscountAmount > 0)
+{
+    <div class="alert alert-success">
+        Coupon <strong>@Model.CouponCode</strong> applied! You saved ₹@Model.DiscountAmount!
+    </div>
+    <h4>Payable After Discount: ₹@Model.TotalAmount</h4>
+}
+else
+{
+    <h4>Total: ₹@Model.TotalAmount</h4>
+}
+
 
 <form asp-controller="Order" asp-action="PlaceOrderWithAddress" method="post">
     <div class="form-group">

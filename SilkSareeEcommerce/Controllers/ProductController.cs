@@ -295,27 +295,71 @@ namespace SilkSareeEcommerce.Controllers
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
             var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
-
             var totalAmount = cartItems.Sum(item => item.Product.Price * item.Quantity);
             var savedAddresses = await _userService.GetSavedAddressesAsync(userId);
+
+            // 🟡 NEW: Handle Discount from Session
+            string discountStr = HttpContext.Session.GetString("DiscountAmount");
+            string couponCode = HttpContext.Session.GetString("CouponCode");
+
+            decimal discountAmount = 0;
+            if (!string.IsNullOrEmpty(discountStr))
+            {
+                decimal.TryParse(discountStr, out discountAmount);
+            }
+
+            decimal finalAmount = totalAmount - discountAmount;
 
             var checkoutViewModel = new CheckoutViewModel
             {
                 CartItems = cartItems,
-                TotalAmount = totalAmount,
+                TotalAmount = finalAmount,
+                DiscountAmount = discountAmount,
+                CouponCode = couponCode,
                 SavedAddresses = savedAddresses.Select((address, index) => new SavedAddressDto
                 {
-                    Id = index + 1, // agar real DB ID nahi hai
+                    Id = index + 1,
                     Address = address
                 }).ToList()
             };
 
-
-
-
-
             return View(checkoutViewModel);
         }
+
+
+
+
+        //important
+
+
+        //[HttpGet]
+        //public async Task<IActionResult> Checkout()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        //    var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
+
+        //    var totalAmount = cartItems.Sum(item => item.Product.Price * item.Quantity);
+        //    var savedAddresses = await _userService.GetSavedAddressesAsync(userId);
+
+        //    var checkoutViewModel = new CheckoutViewModel
+        //    {
+        //        CartItems = cartItems,
+        //        TotalAmount = totalAmount,
+        //        SavedAddresses = savedAddresses.Select((address, index) => new SavedAddressDto
+        //        {
+        //            Id = index + 1, // agar real DB ID nahi hai
+        //            Address = address
+        //        }).ToList()
+        //    };
+
+
+
+
+
+        //    return View(checkoutViewModel);
+        //}
 
 
 

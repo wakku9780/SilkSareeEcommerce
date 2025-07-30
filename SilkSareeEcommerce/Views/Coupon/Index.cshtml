@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SilkSareeEcommerce.Models.Coupon>
+
+@{
+    ViewData["Title"] = "All Coupons";
+}
+
+<h2>All Coupons</h2>
+
+<a class="btn btn-primary" asp-action="Create">Create New Coupon</a>
+
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Discount (%)</th>
+            <th>Expiry</th>
+            <th>Active</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var coupon in Model)
+        {
+            <tr>
+                <td>@coupon.Code</td>
+                <td>@coupon.DiscountPercent</td>
+                <td>@coupon.ExpiryDate.ToString("yyyy-MM-dd")</td>
+                <td>@(coupon.IsActive ? "Yes" : "No")</td>
+            </tr>
+        }
+    </tbody>
+</table>
