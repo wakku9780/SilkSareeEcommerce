@@ -17,9 +17,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg62-turbo \
     libxrender1 \
     libxtst6 \
-    libssl1.1 \
     libssl-dev \
-    libicu66 \
     libkrb5-3 \
     liblttng-ust0 \
     libcurl4 \
@@ -37,13 +35,10 @@ RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
  && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
  && rm dotnet-install.sh
 
-# Set working directory
 WORKDIR /src
 
-# Copy source code
 COPY . .
 
-# Restore and publish
 RUN dotnet restore
 RUN dotnet publish -c Release -o /app/publish --no-restore
 
@@ -52,7 +47,7 @@ FROM ubuntu:20.04 AS runtime
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install only runtime dependencies
+# Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     fontconfig \
     xfonts-75dpi \
@@ -60,8 +55,6 @@ RUN apt-get update && apt-get install -y \
     libjpeg62-turbo \
     libxrender1 \
     libxtst6 \
-    libssl1.1 \
-    libicu66 \
     libkrb5-3 \
     liblttng-ust0 \
     libcurl4 \
@@ -74,17 +67,14 @@ RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkh
  && apt-get update && apt-get install -y ./wkhtmltox_0.12.6-1.bionic_amd64.deb \
  && rm wkhtmltox_0.12.6-1.bionic_amd64.deb
 
-# Set working directory
 WORKDIR /app
 
-# Copy build output
 COPY --from=build /app/publish .
 
-# Expose port
 EXPOSE 8080
 
-# Start app
 ENTRYPOINT ["dotnet", "SilkSareeEcommerce.dll"]
+
 
 
 
