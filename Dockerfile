@@ -1,5 +1,5 @@
-# Use Ubuntu 20.04 base image for compatibility
-FROM ubuntu:20.04
+# ===== STAGE 1: Build stage =====
+FROM ubuntu:20.04 AS build
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -30,6 +30,7 @@ RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkh
     && dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb || apt-get install -f -y \
     && rm wkhtmltox_0.12.6-1.bionic_amd64.deb
 
+# Add symlink for wkhtmltox
 RUN mkdir -p /app/wkhtmltox \
     && ln -s /usr/local/lib/libwkhtmltox.so /app/wkhtmltox/libwkhtmltox.dll
 
@@ -39,29 +40,50 @@ RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
     && rm dotnet-install.sh
 
-# Set working directory for build
 WORKDIR /src
 
-# Copy project files
-COPY . ./
+# Copy project
+COPY . .
 
-# Restore dependencies
+# Restore & publish
 RUN dotnet restore
-
-# Publish app — this ensures wwwroot & everything goes into /app/publish
 RUN dotnet publish -c Release -o /app/publish --no-restore
 
-# Final stage
+# ===== STAGE 2: Runtime Stage =====
+FROM ubuntu:20.04 AS runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install required runtime deps only (no SDK needed here)
+RUN apt-get update && apt-get install -y \
+    libxrender1 \
+    libxtst6 \
+    fontconfig \
+    libssl1.1 \
+    libicu66 \
+    libkrb5-3 \
+    liblttng-ust0 \
+    libcurl4 \
+    zlib1g \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Also install wkhtmltox runtime
+RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb \
+    && dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb || apt-get install -f -y \
+    && rm wkhtmltox_0.12.6-1.bionic_amd64.deb
+
 WORKDIR /app
 
-# Copy only published output
-COPY --from=0 /app/publish .
+# Copy published app from build stage
+COPY --from=build /app/publish .
 
-# Expose the port
+# Expose port
 EXPOSE 8080
 
-# Start the app
+# Start app
 ENTRYPOINT ["dotnet", "SilkSareeEcommerce.dll"]
+
 
 
 
