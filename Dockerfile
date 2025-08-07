@@ -3,17 +3,17 @@ FROM ubuntu:20.04 AS build
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies and .NET prerequisites
+# Install dependencies for build and wkhtmltox
 RUN apt-get update && apt-get install -y \
     wget \
     xfonts-75dpi \
     xfonts-base \
     fontconfig \
-    libjpeg-turbo8 \
+    libjpeg62-turbo \
     libxrender1 \
     libxtst6 \
-    libssl1.1 \
     libssl-dev \
+    libssl1.1 \
     ca-certificates \
     curl \
     apt-transport-https \
@@ -25,14 +25,10 @@ RUN apt-get update && apt-get install -y \
     zlib1g \
     && rm -rf /var/lib/apt/lists/*
 
-# Install wkhtmltox
+# Install wkhtmltox (PDF tool)
 RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb \
-    && dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb || apt-get install -f -y \
+    && apt-get update && apt-get install -y ./wkhtmltox_0.12.6-1.bionic_amd64.deb \
     && rm wkhtmltox_0.12.6-1.bionic_amd64.deb
-
-# Add symlink for wkhtmltox
-RUN mkdir -p /app/wkhtmltox \
-    && ln -s /usr/local/lib/libwkhtmltox.so /app/wkhtmltox/libwkhtmltox.dll
 
 # Install .NET 8 SDK
 RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
@@ -40,12 +36,13 @@ RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
     && rm dotnet-install.sh
 
+# Set working directory
 WORKDIR /src
 
-# Copy project
+# Copy project files
 COPY . .
 
-# Restore & publish
+# Restore and publish
 RUN dotnet restore
 RUN dotnet publish -c Release -o /app/publish --no-restore
 
@@ -54,7 +51,7 @@ FROM ubuntu:20.04 AS runtime
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install required runtime deps only (no SDK needed here)
+# Install only runtime dependencies
 RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxtst6 \
@@ -66,26 +63,27 @@ RUN apt-get update && apt-get install -y \
     libcurl4 \
     zlib1g \
     ca-certificates \
+    xfonts-75dpi \
+    xfonts-base \
+    libjpeg62-turbo \
     && rm -rf /var/lib/apt/lists/*
 
-# Also install wkhtmltox runtime
+# Install wkhtmltox again for runtime
 RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb \
-    && dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb || apt-get install -f -y \
+    && apt-get update && apt-get install -y ./wkhtmltox_0.12.6-1.bionic_amd64.deb \
     && rm wkhtmltox_0.12.6-1.bionic_amd64.deb
 
+# Set working directory
 WORKDIR /app
 
-# Copy published app from build stage
+# Copy from build
 COPY --from=build /app/publish .
 
-# Expose port
+# Expose the port
 EXPOSE 8080
 
-# Start app
+# Run the app
 ENTRYPOINT ["dotnet", "SilkSareeEcommerce.dll"]
-
-
-
 
 
 
