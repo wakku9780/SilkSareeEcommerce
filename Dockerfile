@@ -51,7 +51,9 @@ COPY . .
 
 # Restore dependencies and publish app
 RUN dotnet restore
-RUN dotnet publish -c Release -o out
+#RUN dotnet publish -c Release -o out
+RUN dotnet publish -c Release -o out --no-restore
+
 
 # Expose port (optional, if your app listens on this port)
 EXPOSE 8080
