@@ -38,6 +38,31 @@ namespace SilkSareeEcommerce.Controllers
             return RedirectToAction("Index");
         }
 
+
+        //[HttpPost]
+        //public async Task<IActionResult> ApplyCoupon(string code)
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // get logged in user ID
+        //    var cartTotal = await _cartService.GetCartTotalAsync(userId); // assume you have this
+
+        //    var coupon = await _couponService.ApplyCouponAsync(userId, code, cartTotal);
+
+        //    if (coupon == null)
+        //    {
+        //        TempData["CouponError"] = "Invalid, expired, or already used coupon.";
+        //        return RedirectToAction("Index");
+        //    }
+
+        //    HttpContext.Session.SetString("CouponCode", code);
+        //    HttpContext.Session.SetDecimal("DiscountPercent", coupon.DiscountPercent);
+
+        //    return RedirectToAction("Index");
+        //}
+
+
+
+
+        //PRiority
         [HttpPost]
         public async Task<IActionResult> ApplyCoupon(string code)
         {
@@ -50,7 +75,7 @@ namespace SilkSareeEcommerce.Controllers
             if (coupon == null)
             {
                 TempData["Error"] = "Invalid or expired coupon!";
-                return RedirectToAction("Checkout", "Product");
+                return RedirectToAction("ViewCart", "Product");
             }
 
             decimal discount = cartTotal * (coupon.DiscountPercent / 100);
@@ -58,7 +83,7 @@ namespace SilkSareeEcommerce.Controllers
             HttpContext.Session.SetString("DiscountAmount", discount.ToString());
 
             TempData["Success"] = $"Coupon applied. You saved ₹{discount}!";
-            return RedirectToAction("Checkout", "Product");
+            return RedirectToAction("ViewCart", "Product");
         }
 
 

@@ -7,6 +7,8 @@ using SilkSareeEcommerce.Models;
 using SilkSareeEcommerce.Repositories;
 using SilkSareeEcommerce.Services;
 using Microsoft.Extensions.Options;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,8 +38,15 @@ builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new 
 
 
 //Add DbContext using connection string from configuration
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+
+
 
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -83,6 +92,8 @@ builder.Services.AddScoped<ProductReviewService>();
 
 builder.Services.AddSingleton<CloudinaryService>();
 builder.Services.AddScoped<CouponService>();
+builder.Services.AddSingleton<FirebaseService>();
+
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EmailService>();

@@ -22,12 +22,20 @@ namespace SilkSareeEcommerce.Data
 
         public DbSet<Coupon> Coupons { get; set; }
 
+        public DbSet<UserCoupon> UserCoupons { get; set; }
+
+
 
         public DbSet<ProductReview> ProductReviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+
+            builder.Entity<UserCoupon>()
+        .HasIndex(uc => new { uc.UserId, uc.CouponId })
+        .IsUnique(); // Prevent multiple uses
 
 
             builder.Entity<Product>()

@@ -12,6 +12,23 @@ namespace SilkSareeEcommerce.Services
             _couponRepo = couponRepo;
         }
 
+        //public async Task<Coupon?> ApplyCouponAsync(string code, decimal cartTotal, string userId)
+        //{
+        //    var coupon = await _couponRepo.GetByCodeAsync(code);
+
+        //    if (coupon == null || !coupon.IsActive || coupon.ExpiryDate <= DateTime.Now)
+        //        return null;
+
+        //    // 🔴 Check if already used by this user
+        //    bool alreadyUsed = await _couponRepo.HasUserUsedCouponAsync(userId, coupon.Id);
+        //    if (alreadyUsed)
+        //        return null;
+
+        //    // ✅ Valid coupon
+        //    return coupon;
+        //}
+
+
         public async Task<Coupon?> ApplyCouponAsync(string code, decimal cartTotal)
         {
             var coupon = await _couponRepo.GetByCodeAsync(code);

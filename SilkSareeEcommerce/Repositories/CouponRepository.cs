@@ -13,6 +13,25 @@ namespace SilkSareeEcommerce.Repositories
             _context = context;
         }
 
+        public async Task<bool> HasUserUsedCouponAsync(string userId, int couponId)
+        {
+            return await _context.UserCoupons
+                .AnyAsync(uc => uc.UserId == userId && uc.CouponId == couponId);
+        }
+
+        public async Task SaveUserCouponAsync(string userId, int couponId)
+        {
+            var userCoupon = new UserCoupon
+            {
+                UserId = userId,
+                CouponId = couponId,
+                UsedAt = DateTime.UtcNow
+            };
+            _context.UserCoupons.Add(userCoupon);
+            await _context.SaveChangesAsync();
+        }
+
+
         public async Task<Coupon?> GetByCodeAsync(string code)
         {
             return await _context.Coupons.FirstOrDefaultAsync(c => c.Code == code);

@@ -8,5 +8,9 @@ namespace SilkSareeEcommerce.Repositories
         Task<List<Coupon>> GetAllAsync();
         Task AddAsync(Coupon coupon);
         Task<bool> IsValidAsync(string code);
+
+        Task<bool> HasUserUsedCouponAsync(string userId, int couponId);
+        Task SaveUserCouponAsync(string userId, int couponId);
+
     }
 }
