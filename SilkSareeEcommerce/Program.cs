@@ -169,7 +169,11 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.Run();
+//app.Run();
+
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+app.Run($"http://0.0.0.0:{port}");
+
 
 // **Seed Roles & Admin User Method**
 async Task SeedRolesAndAdmin(IServiceProvider serviceProvider)
