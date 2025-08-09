@@ -14,3 +14,5 @@ services:
         value: http://0.0.0.0:8080
       - key: ASPNETCORE_FORWARDEDHEADERS_ENABLED
         value: true
+      - key: ConnectionStrings__DefaultConnection
+        value: Host=ep-long-wildflower-ad0trn66-pooler.c-2.us-east-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=npg_NEAyfRkj2KQ3;Ssl Mode=Require;Trust Server Certificate=true

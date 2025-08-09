@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SilkSareeEcommerce.Controllers
 {
-    [Authorize]
     public class ProductController : Controller
     {
         private readonly ProductService _productService;
@@ -43,22 +42,40 @@ namespace SilkSareeEcommerce.Controllers
 
         public async Task<IActionResult> Index(string name, int? categoryId, decimal? minPrice, decimal? maxPrice)
         {
-            var products = await _productService.SearchProductsAsync(name, categoryId, minPrice, maxPrice);
-
-            foreach (var product in products)
+            try
             {
-                var reviews = await _reviewService.GetAverageRatingAsync(product.Id);
-                // product.AverageRating = await _reviewService.GetAverageRatingAsync(product.Id);
-                // Directly get the average rating as a decimal
-                decimal? averageRating = await _reviewService.GetAverageRatingAsync(product.Id);
+                var products = await _productService.SearchProductsAsync(name, categoryId, minPrice, maxPrice);
 
-                // Assign either the rating or 0 if null
-                product.AverageRating = averageRating ?? 0m;
+                foreach (var product in products)
+                {
+                    try
+                    {
+                        var reviews = await _reviewService.GetAverageRatingAsync(product.Id);
+                        // product.AverageRating = await _reviewService.GetAverageRatingAsync(product.Id);
+                        // Directly get the average rating as a decimal
+                        decimal? averageRating = await _reviewService.GetAverageRatingAsync(product.Id);
 
+                        // Assign either the rating or 0 if null
+                        product.AverageRating = averageRating ?? 0m;
+                    }
+                    catch (Exception ex)
+                    {
+                        // ✅ If review service fails, set rating to 0 and continue
+                        product.AverageRating = 0m;
+                        Console.WriteLine($"Error getting reviews for product {product.Id}: {ex.Message}");
+                    }
+                }
+
+                ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
+                return View(products);
             }
-
-            ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
-            return View(products);
+            catch (Exception ex)
+            {
+                // ✅ Log the error and return error view
+                Console.WriteLine($"Error in Product Index: {ex.Message}");
+                TempData["Error"] = "Unable to load products. Please try again later.";
+                return View(new List<Product>()); // Return empty list instead of error
+            }
         }
 
 
@@ -71,6 +88,7 @@ namespace SilkSareeEcommerce.Controllers
 
 
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             ViewBag.Categories = new SelectList(await _categoryService.GetAllCategoriesAsync(), "Id", "Name");
@@ -219,6 +237,7 @@ namespace SilkSareeEcommerce.Controllers
         }
 
         // 🛒 ✅ ADD TO CART METHOD
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
         {
@@ -239,6 +258,7 @@ namespace SilkSareeEcommerce.Controllers
         }
 
         // 🛒 ✅ VIEW CART METHOD
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> ViewCart()
         {
@@ -288,6 +308,7 @@ namespace SilkSareeEcommerce.Controllers
         }
 
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Checkout()
         {
@@ -418,6 +439,7 @@ namespace SilkSareeEcommerce.Controllers
         //}
 
 
+        [Authorize]
         [HttpGet("BuyNow/{id}")]
         public async Task<IActionResult> BuyNow(int id)
         {

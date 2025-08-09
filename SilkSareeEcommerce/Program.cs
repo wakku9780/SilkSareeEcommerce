@@ -139,11 +139,26 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
-// **Seed Roles & Admin User**
+// **Ensure Database is Created & Seed Roles & Admin User**
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await SeedRolesAndAdmin(services);
+    
+    // ✅ Ensure database is created and migrations are applied
+    try 
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        await context.Database.EnsureCreatedAsync();
+        // If you have migrations, use this instead:
+        // await context.Database.MigrateAsync();
+        
+        await SeedRolesAndAdmin(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while ensuring database creation.");
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -164,9 +179,6 @@ app.UseStaticFiles(new StaticFileOptions
     {
         // Cache static files for 1 year
         ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000");
-        
-        // ✅ Debug logging for static files
-        Console.WriteLine($"Serving static file: {ctx.File.Name}");
     }
 });
 
