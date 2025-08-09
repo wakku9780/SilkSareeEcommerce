@@ -149,9 +149,32 @@ using (var scope = app.Services.CreateScope())
     try 
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        await context.Database.EnsureCreatedAsync();
-        // If you have migrations, use this instead:
-        // await context.Database.MigrateAsync();
+        
+        // Try to apply migrations first
+        try
+        {
+            await context.Database.MigrateAsync();
+            Console.WriteLine("✅ Migrations applied successfully");
+        }
+        catch (Exception migrationEx)
+        {
+            Console.WriteLine($"⚠️ Migration failed, trying manual fix: {migrationEx.Message}");
+            
+            // Manual fix for RowVersion column issue
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync("ALTER TABLE \"Products\" DROP COLUMN IF EXISTS \"RowVersion\"");
+                Console.WriteLine("✅ Manual RowVersion column removal successful");
+            }
+            catch (Exception dropEx)
+            {
+                Console.WriteLine($"⚠️ Manual column drop failed: {dropEx.Message}");
+            }
+            
+            // Fallback to EnsureCreated
+            await context.Database.EnsureCreatedAsync();
+            Console.WriteLine("✅ Database ensured with EnsureCreated");
+        }
         
         await SeedRolesAndAdmin(services);
     }
@@ -159,6 +182,7 @@ using (var scope = app.Services.CreateScope())
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while ensuring database creation.");
+        Console.WriteLine($"❌ Database initialization failed: {ex.Message}");
     }
 }
 
