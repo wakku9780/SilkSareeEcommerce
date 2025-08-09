@@ -36,8 +36,8 @@ builder.Services.AddSession(options =>
 
 // Load native wkhtmltox library
 var wkhtmltoxPath = Path.Combine(Directory.GetCurrentDirectory(), "wkhtmltox", "libwkhtmltox.dll");
-var context = new CustomAssemblyLoadContext();
-context.LoadUnmanagedLibrary(wkhtmltoxPath);
+var loadContext = new CustomAssemblyLoadContext();
+loadContext.LoadUnmanagedLibrary(wkhtmltoxPath);
 
 // Register DinkToPdf converter
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
