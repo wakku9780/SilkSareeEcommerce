@@ -12,6 +12,9 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ✅ Fix PostgreSQL DateTime timezone issues
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 // ✅ Configure static files for deployment
 builder.Services.Configure<StaticFileOptions>(options =>
 {
@@ -48,8 +51,7 @@ builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new 
 //    options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), 
-        npgsqlOptions => npgsqlOptions.EnableLegacyTimestampBehavior()));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

@@ -8,7 +8,11 @@ namespace SilkSareeEcommerce.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) 
+        {
+            // ✅ Configure for PostgreSQL timezone handling
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        }
 
         public DbSet<SavedAddress> SavedAddresses { get; set; }
         public DbSet<Product> Products { get; set; }
