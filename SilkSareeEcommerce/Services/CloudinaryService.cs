@@ -13,6 +13,24 @@ namespace SilkSareeEcommerce.Services
             var apiKey = configuration["Cloudinary:ApiKey"];
             var apiSecret = configuration["Cloudinary:ApiSecret"];
 
+            // ✅ Add debugging and validation
+            Console.WriteLine($"🔍 Cloudinary Config - CloudName: {cloudName}, ApiKey: {apiKey}, ApiSecret: {(string.IsNullOrEmpty(apiSecret) ? "Empty" : "Present")}");
+
+            if (string.IsNullOrEmpty(cloudName))
+            {
+                throw new ArgumentException("Cloudinary CloudName is not configured. Please check your appsettings.json or environment variables.");
+            }
+
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                throw new ArgumentException("Cloudinary ApiKey is not configured. Please check your appsettings.json or environment variables.");
+            }
+
+            if (string.IsNullOrEmpty(apiSecret))
+            {
+                throw new ArgumentException("Cloudinary ApiSecret is not configured. Please check your appsettings.json or environment variables.");
+            }
+
             var account = new Account(cloudName, apiKey, apiSecret);
             _cloudinary = new Cloudinary(account);
         }

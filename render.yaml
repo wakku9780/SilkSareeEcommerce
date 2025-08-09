@@ -16,3 +16,23 @@ services:
         value: true
       - key: ConnectionStrings__DefaultConnection
         value: Host=ep-long-wildflower-ad0trn66-pooler.c-2.us-east-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=npg_NEAyfRkj2KQ3;Ssl Mode=Require;Trust Server Certificate=true
+      - key: Cloudinary__CloudName
+        value: dq8lfyvyy
+      - key: Cloudinary__ApiKey
+        value: 978657848943585
+      - key: Cloudinary__ApiSecret
+        value: Aap4zI16z-kl9Bag09tzGPhUVz0
+      - key: EmailSettings__SMTPServer
+        value: smtp.gmail.com
+      - key: EmailSettings__SMTPPort
+        value: 587
+      - key: EmailSettings__SenderEmail
+        value: wakku9780@gmail.com
+      - key: EmailSettings__SenderPassword
+        value: yujqwkormkucjarf
+      - key: PayPal__ClientId
+        value: AcfpECBv5_n7cBHWLtNt53ArdoB9oU8HN3NtZVPKzmzQfivNKDSld1JPQQAmFWjP1fUU0stRGH5JCyYq
+      - key: PayPal__Secret
+        value: EOU0e_Wu_WKv_jH1x4dfXu06CDDkRlHSwf46axxCK5nBt3ERH1P92fvh1rZs8Miu8iIloB_quReZZAeV
+      - key: PayPal__Mode
+        value: sandbox
