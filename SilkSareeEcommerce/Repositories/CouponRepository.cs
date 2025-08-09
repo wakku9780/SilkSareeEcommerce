@@ -51,7 +51,7 @@ namespace SilkSareeEcommerce.Repositories
         public async Task<bool> IsValidAsync(string code)
         {
             var coupon = await GetByCodeAsync(code);
-            return coupon != null && coupon.IsActive && coupon.ExpiryDate > DateTime.Now;
+            return coupon != null && coupon.IsActive && coupon.ExpiryDate > DateTime.UtcNow;
         }
     }
 

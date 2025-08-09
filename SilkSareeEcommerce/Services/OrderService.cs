@@ -125,7 +125,7 @@ namespace SilkSareeEcommerce.Services
             var order = new Order
             {
                 UserId = userId,
-                OrderDate = DateTime.Now,
+                OrderDate = DateTime.UtcNow,
                 PaymentMethod = paymentMethod,
                 TotalAmount = product.Price * quantity,
                 Status = "Pending",

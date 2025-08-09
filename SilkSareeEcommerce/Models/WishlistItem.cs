@@ -15,7 +15,7 @@ namespace SilkSareeEcommerce.Models
         [Required]
         public int ProductId { get; set; }  // Foreign Key for Product
 
-        public DateTime AddedDate { get; set; } = DateTime.Now;
+        public DateTime AddedDate { get; set; } = DateTime.UtcNow;
 
         // Navigation Properties
         [ForeignKey("UserId")]

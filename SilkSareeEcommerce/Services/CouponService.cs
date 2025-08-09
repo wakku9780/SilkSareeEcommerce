@@ -32,7 +32,7 @@ namespace SilkSareeEcommerce.Services
         public async Task<Coupon?> ApplyCouponAsync(string code, decimal cartTotal)
         {
             var coupon = await _couponRepo.GetByCodeAsync(code);
-            if (coupon == null || !coupon.IsActive || coupon.ExpiryDate <= DateTime.Now)
+            if (coupon == null || !coupon.IsActive || coupon.ExpiryDate <= DateTime.UtcNow)
                 return null;
 
             return coupon;

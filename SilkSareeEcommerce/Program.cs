@@ -48,7 +48,8 @@ builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new 
 //    options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), 
+        npgsqlOptions => npgsqlOptions.EnableLegacyTimestampBehavior()));
 
 
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

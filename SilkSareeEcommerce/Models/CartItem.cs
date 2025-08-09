@@ -19,7 +19,7 @@ namespace SilkSareeEcommerce.Models
         [Range(1, 100, ErrorMessage = "Quantity must be between 1 and 100.")]
         public int Quantity { get; set; }
 
-        public DateTime AddedDate { get; set; } = DateTime.Now;
+        public DateTime AddedDate { get; set; } = DateTime.UtcNow;
 
         // Navigation Properties
         [ForeignKey("UserId")]

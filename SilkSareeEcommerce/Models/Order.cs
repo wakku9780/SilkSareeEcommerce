@@ -6,7 +6,7 @@ namespace SilkSareeEcommerce.Models
     {
         public int Id { get; set; }
         public string UserId { get; set; }   // Foreign key for ApplicationUser
-        public DateTime OrderDate { get; set; } = DateTime.Now;
+        public DateTime OrderDate { get; set; } = DateTime.UtcNow;
         public decimal TotalAmount { get; set; }
 
         public string PaymentMethod { get; set; }

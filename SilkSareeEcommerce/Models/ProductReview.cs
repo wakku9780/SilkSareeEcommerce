@@ -18,7 +18,7 @@ namespace SilkSareeEcommerce.Models
         [Required]
         public string Comment { get; set; } = string.Empty;
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation Property to link with Product
         public Product? Product { get; set; }
