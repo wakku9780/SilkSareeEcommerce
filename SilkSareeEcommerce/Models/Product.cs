@@ -35,8 +35,8 @@ namespace SilkSareeEcommerce.Models
 
 
 
-        [Timestamp]
-        public byte[] RowVersion { get; set; } // ⚠️ This is important
+        // [Timestamp] - Commented out for PostgreSQL compatibility
+        // public byte[]? RowVersion { get; set; } // ✅ Removed for PostgreSQL
 
         public ICollection<ProductReview> Reviews { get; set; } = new List<ProductReview>();
 

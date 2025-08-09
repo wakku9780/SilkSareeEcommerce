@@ -32,6 +32,8 @@ namespace SilkSareeEcommerce.Data
         {
             base.OnModelCreating(builder);
 
+            // ✅ RowVersion configuration removed for PostgreSQL compatibility
+            // PostgreSQL doesn't handle RowVersion the same way as SQL Server
 
             builder.Entity<UserCoupon>()
         .HasIndex(uc => new { uc.UserId, uc.CouponId })
