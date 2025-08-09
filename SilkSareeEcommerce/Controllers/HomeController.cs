@@ -15,7 +15,16 @@ namespace SilkSareeEcommerce.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            try
+            {
+                Console.WriteLine("✅ Home/Index called successfully");
+                return View();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error in Home/Index: {ex.Message}");
+                throw;
+            }
         }
 
         public IActionResult Privacy()

@@ -44,7 +44,9 @@ namespace SilkSareeEcommerce.Controllers
         {
             try
             {
+                Console.WriteLine("🔍 Starting Product Index method");
                 var products = await _productService.SearchProductsAsync(name, categoryId, minPrice, maxPrice);
+                Console.WriteLine($"✅ Retrieved {products?.Count ?? 0} products");
 
                 foreach (var product in products)
                 {
