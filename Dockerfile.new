@@ -1,0 +1,77 @@
+# ===== STAGE 1: Build stage =====
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+WORKDIR /src
+
+# Copy csproj file first (for better caching)
+COPY SilkSareeEcommerce/SilkSareeEcommerce.csproj SilkSareeEcommerce/
+RUN dotnet restore SilkSareeEcommerce/SilkSareeEcommerce.csproj
+
+# Copy the rest of the source code
+COPY . .
+
+# Build and publish the application
+WORKDIR /src/SilkSareeEcommerce
+RUN dotnet publish -c Release -o /app/publish --no-restore
+
+# ===== STAGE 2: Runtime stage =====
+FROM ubuntu:20.04 AS runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    fontconfig \
+    xfonts-75dpi \
+    xfonts-base \
+    libjpeg-turbo8 \
+    libxrender1 \
+    libxtst6 \
+    libssl1.1 \
+    libssl-dev \
+    ca-certificates \
+    curl \
+    apt-transport-https \
+    gnupg \
+    libicu66 \
+    libkrb5-3 \
+    liblttng-ust0 \
+    libcurl4 \
+    zlib1g \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install wkhtmltopdf
+RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb \
+    && dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb || apt-get install -f -y \
+    && rm wkhtmltox_0.12.6-1.bionic_amd64.deb
+
+# Install .NET runtime
+RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
+    && bash dotnet-install.sh --channel 8.0 --runtime aspnetcore --install-dir /usr/share/dotnet \
+    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
+    && rm dotnet-install.sh
+
+# Set up wkhtmltox library path
+RUN mkdir -p /app/wkhtmltox \
+    && ln -s /usr/local/lib/libwkhtmltox.so /app/wkhtmltox/libwkhtmltox.dll
+
+# App directory
+WORKDIR /app
+
+# Copy build output from build stage
+COPY --from=build /app/publish .
+
+# ✅ Ensure wwwroot directory exists and has proper permissions
+RUN chmod -R 755 wwwroot || true
+
+# Set environment variables
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Expose port
+EXPOSE 8080
+
+# Run the app
+ENTRYPOINT ["dotnet", "SilkSareeEcommerce.dll"]
+

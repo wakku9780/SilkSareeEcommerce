@@ -12,6 +12,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ✅ Configure static files for deployment
+builder.Services.Configure<StaticFileOptions>(options =>
+{
+    options.ServeUnknownFileTypes = true;
+});
+
  
 
 // Add services to the container.
@@ -150,7 +156,20 @@ if (!app.Environment.IsDevelopment())
 app.UseSession();
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+
+// ✅ Configure static files for production deployment
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // Cache static files for 1 year
+        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000");
+        
+        // ✅ Debug logging for static files
+        Console.WriteLine($"Serving static file: {ctx.File.Name}");
+    }
+});
+
 app.UseRouting();
 
 // Authentication & Authorization Middleware
