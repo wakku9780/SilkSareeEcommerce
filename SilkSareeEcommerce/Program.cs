@@ -145,6 +145,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     
     // ✅ Ensure database is created and migrations are applied
+    //
     
     try 
     {
