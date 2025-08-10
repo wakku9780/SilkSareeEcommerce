@@ -3,6 +3,7 @@ using System.Security.Claims;
 using SilkSareeEcommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using SilkSareeEcommerce.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace SilkSareeEcommerce.Controllers
 {
@@ -12,16 +13,24 @@ namespace SilkSareeEcommerce.Controllers
         private readonly OrderService _orderService;
         private readonly CartService _cartService;
         private readonly ProductService _productService;
-
-
         private readonly UserService _userService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<OrderController> _logger;
 
-        public OrderController(OrderService orderService, CartService cartService, ProductService productService, UserService userService)
+        public OrderController(
+            OrderService orderService, 
+            CartService cartService, 
+            ProductService productService, 
+            UserService userService,
+            UserManager<ApplicationUser> userManager,
+            ILogger<OrderController> logger)
         {
             _orderService = orderService;
             _cartService = cartService;
             _productService = productService;
             _userService = userService;
+            _userManager = userManager;
+            _logger = logger;
         }
         [HttpGet]
         public IActionResult Index()
@@ -73,7 +82,34 @@ namespace SilkSareeEcommerce.Controllers
                 // ✅ Order placed successfully, now clear the cart
                 await _cartService.ClearCartAsync(userId);
 
-                TempData["Success"] = "Your order has been placed successfully with Cash on Delivery!";
+                // ✅ Send order confirmation email
+                try
+                {
+                    var user = await _userManager.FindByIdAsync(userId);
+                    if (user != null)
+                    {
+                        var shippingAddress = await _userService.GetAddressAsync(userId);
+                        var addressText = shippingAddress?.Address ?? "Address not specified";
+                        
+                        var emailSent = await _orderService.SendOrderConfirmationEmailAsync(order, user, addressText);
+                        
+                        if (emailSent)
+                        {
+                            _logger.LogInformation($"Order confirmation email sent successfully for order #{order.Id}");
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"Failed to send order confirmation email for order #{order.Id}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error sending order confirmation email for order #{order.Id}: {ex.Message}");
+                    // Don't fail the order if email fails
+                }
+
+                TempData["Success"] = "Your order has been placed successfully with Cash on Delivery! Check your email for confirmation.";
                 return RedirectToAction("OrderSuccess");
             }
             else if (PaymentMethod == "PayPal")
@@ -307,6 +343,30 @@ namespace SilkSareeEcommerce.Controllers
 
                 await _cartService.ClearCartAsync(userId);
 
+                // ✅ Send order confirmation email
+                try
+                {
+                    var user = await _userManager.FindByIdAsync(userId);
+                    if (user != null)
+                    {
+                        var emailSent = await _orderService.SendOrderConfirmationEmailAsync(order, user, finalShippingAddress);
+                        
+                        if (emailSent)
+                        {
+                            _logger.LogInformation($"Order confirmation email sent successfully for order #{order.Id}");
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"Failed to send order confirmation email for order #{order.Id}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error sending order confirmation email for order #{order.Id}: {ex.Message}");
+                    // Don't fail the order if email fails
+                }
+
                 var invoicePdf = await _orderService.GenerateOrderInvoiceAsync(order.Id);
                 var invoiceDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "invoices");
                 if (!Directory.Exists(invoiceDir)) Directory.CreateDirectory(invoiceDir);
@@ -315,7 +375,7 @@ namespace SilkSareeEcommerce.Controllers
                 var fullPath = Path.Combine(invoiceDir, fileName);
                 System.IO.File.WriteAllBytes(fullPath, invoicePdf);
 
-                TempData["Success"] = "Your order has been placed successfully with Cash on Delivery!";
+                TempData["Success"] = "Your order has been placed successfully with Cash on Delivery! Check your email for confirmation.";
                 TempData["InvoiceFile"] = "/invoices/" + fileName;
 
                 return RedirectToAction("OrderSuccess");

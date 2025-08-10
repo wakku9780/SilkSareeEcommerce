@@ -113,6 +113,7 @@ builder.Services.AddSingleton<FirebaseService>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<EmailTemplateService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<ProductService>();
@@ -191,16 +192,32 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// ✅ FORCE detailed error pages for debugging (temporarily)
+app.UseDeveloperExceptionPage();
+
+// ✅ Custom middleware to log all errors
+app.Use(async (context, next) =>
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-else
-{
-    // ✅ Show detailed errors in development
-    app.UseDeveloperExceptionPage();
-}
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ MIDDLEWARE CAUGHT ERROR: {ex.Message}");
+        Console.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+        Console.WriteLine($"❌ Inner exception: {ex.InnerException?.Message}");
+        Console.WriteLine($"❌ Request path: {context.Request.Path}");
+        throw; // Re-throw to let DeveloperExceptionPage handle it
+    }
+});
+
+// Comment out production error handling for now
+// if (!app.Environment.IsDevelopment())
+// {
+//     app.UseExceptionHandler("/Home/Error");
+//     app.UseHsts();
+// }
 
 app.UseSession();
 

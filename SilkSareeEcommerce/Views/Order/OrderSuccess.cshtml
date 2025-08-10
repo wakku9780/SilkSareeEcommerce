@@ -3,21 +3,44 @@
 }
 
 <div class="container mt-5">
-    <div class="alert alert-success text-center">
-        <h2>🎉 Order Placed Successfully!</h2>
-        <p>@TempData["Success"]</p>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white text-center">
+                    <h2 class="mb-0">🎉 Order Placed Successfully!</h2>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h4 class="text-success mb-3">@TempData["Success"]</h4>
+                    
+                    <div class="alert alert-info">
+                        <h5>📧 Email Confirmation Sent!</h5>
+                        <p class="mb-0">We've sent a detailed order confirmation email to your registered email address. Please check your inbox (and spam folder) for order details.</p>
+                    </div>
 
-        @if (TempData["InvoiceFile"] != null)
-        {
-            <p>
-                <a href="@TempData["InvoiceFile"]" target="_blank" class="btn btn-success">
-                    Download Invoice PDF
-                </a>
-            </p>
-        }
+                    @if (TempData["InvoiceFile"] != null)
+                    {
+                        <div class="mb-3">
+                            <a href="@TempData["InvoiceFile"]" target="_blank" class="btn btn-success btn-lg">
+                                <i class="fas fa-download"></i> Download Invoice PDF
+                            </a>
+                        </div>
+                    }
 
-        <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-2">Continue Shopping</a>
-        <a href="@Url.Action("GetUserOrders", "Order")" class="btn btn-secondary mt-2">View My Orders</a>
+                    <div class="d-grid gap-2 d-md-block">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg">
+                            <i class="fas fa-shopping-cart"></i> Continue Shopping
+                        </a>
+                        <a href="@Url.Action("GetUserOrders", "Order")" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-list"></i> View My Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

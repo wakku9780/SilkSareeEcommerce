@@ -74,7 +74,9 @@ namespace SilkSareeEcommerce.Controllers
             catch (Exception ex)
             {
                 // ✅ Log the error and return error view
-                Console.WriteLine($"Error in Product Index: {ex.Message}");
+                Console.WriteLine($"❌ Error in Product Index: {ex.Message}");
+                Console.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+                Console.WriteLine($"❌ Inner exception: {ex.InnerException?.Message}");
                 TempData["Error"] = "Unable to load products. Please try again later.";
                 return View(new List<Product>()); // Return empty list instead of error
             }
@@ -243,20 +245,36 @@ namespace SilkSareeEcommerce.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
         {
-            var product = await _productService.GetProductByIdAsync(productId);
-            if (product == null)
+            try
             {
-                return NotFound();
-            }
+                Console.WriteLine($"🛒 AddToCart called - ProductId: {productId}, Quantity: {quantity}");
+                
+                var product = await _productService.GetProductByIdAsync(productId);
+                if (product == null)
+                {
+                    Console.WriteLine($"❌ Product not found: {productId}");
+                    return NotFound();
+                }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    Console.WriteLine("❌ User not authenticated");
+                    return Unauthorized();
+                }
+
+                Console.WriteLine($"✅ Adding to cart - UserId: {userId}, ProductId: {product.Id}");
+                await _cartService.AddToCartAsync(userId, product.Id, quantity);
+                Console.WriteLine("✅ Successfully added to cart");
+                
+                return RedirectToAction(nameof(ViewCart));
+            }
+            catch (Exception ex)
             {
-                return Unauthorized();
+                Console.WriteLine($"❌ Error in AddToCart: {ex.Message}");
+                Console.WriteLine($"❌ Stack trace: {ex.StackTrace}");
+                throw; // Re-throw to see full error page
             }
-
-            await _cartService.AddToCartAsync(userId, product.Id, quantity);
-            return RedirectToAction(nameof(ViewCart));
         }
 
         // 🛒 ✅ VIEW CART METHOD
