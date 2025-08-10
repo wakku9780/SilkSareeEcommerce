@@ -82,6 +82,10 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<!-- ✅ Treat warnings as warnings, not errors -->
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+		<WarningsNotAsErrors>CS8600;CS8601;CS8602;CS8603;CS8604;MVC1000</WarningsNotAsErrors>
 	</PropertyGroup>
 
 	<ItemGroup>

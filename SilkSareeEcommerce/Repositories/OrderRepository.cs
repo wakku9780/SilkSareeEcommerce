@@ -106,7 +106,7 @@ namespace SilkSareeEcommerce.Repositories
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return order;
+                return order ?? throw new InvalidOperationException("Failed to create order");
             }
             catch (Exception ex)
             {

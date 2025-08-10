@@ -1,28 +1,35 @@
 ﻿<!-- Product Details View -->
 @model SilkSareeEcommerce.Models.Product
 
-<h2>@Model.Name</h2>
-<p>@Model.Description</p>
-<p>Price: @Model.Price</p>
+@if (Model != null)
+{
+    <h2>@Model.Name</h2>
+    <p>@Model.Description</p>
+    <p>Price: @Model.Price</p>
 
-<!-- Add Review Form -->
-<form asp-action="AddReview" asp-controller="ProductReview" method="post">
-    <!-- Hidden field to store ProductId -->
-    <input type="hidden" name="ProductId" value="@Model.Id" />
+    <!-- Add Review Form -->
+    <form asp-action="AddReview" asp-controller="ProductReview" method="post">
+        <!-- Hidden field to store ProductId -->
+        <input type="hidden" name="ProductId" value="@Model.Id" />
 
-    <label for="userId">User ID:</label>
-    <input type="text" name="UserId" value="@User.Identity.Name" required />
+        <label for="userId">User ID:</label>
+        <input type="text" name="UserId" value="@User.Identity?.Name" required />
 
-    <label for="rating">Rating:</label>
-    <select name="Rating" required>
-        @for (int i = 1; i <= 5; i++)
-        {
-            <option value="@i">@i</option>
-        }
-    </select>
+        <label for="rating">Rating:</label>
+        <select name="Rating" required>
+            @for (int i = 1; i <= 5; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>
 
-    <label for="comment">Review:</label>
-    <textarea name="Comment" required></textarea>
+        <label for="comment">Review:</label>
+        <textarea name="Comment" required></textarea>
 
-    <button type="submit">Submit</button>
-</form>
+        <button type="submit">Submit</button>
+    </form>
+}
+else
+{
+    <p>Product not found.</p>
+}

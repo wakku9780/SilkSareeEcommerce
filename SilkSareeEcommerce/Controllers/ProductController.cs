@@ -336,12 +336,17 @@ namespace SilkSareeEcommerce.Controllers
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
             var cartItems = (await _cartService.GetCartItemsAsync(userId)).ToList();
-            var totalAmount = cartItems.Sum(item => item.Product.Price * item.Quantity);
+            if (cartItems == null || !cartItems.Any())
+            {
+                return RedirectToAction("ViewCart");
+            }
+
+            var totalAmount = cartItems.Sum(item => item.Product?.Price * item.Quantity ?? 0);
             var savedAddresses = await _userService.GetSavedAddressesAsync(userId);
 
             // 🟡 NEW: Handle Discount from Session
-            string discountStr = HttpContext.Session.GetString("DiscountAmount");
-            string couponCode = HttpContext.Session.GetString("CouponCode");
+            string? discountStr = HttpContext.Session.GetString("DiscountAmount");
+            string? couponCode = HttpContext.Session.GetString("CouponCode");
 
             decimal discountAmount = 0;
             if (!string.IsNullOrEmpty(discountStr))
@@ -357,11 +362,11 @@ namespace SilkSareeEcommerce.Controllers
                 TotalAmount = finalAmount,
                 DiscountAmount = discountAmount,
                 CouponCode = couponCode,
-                SavedAddresses = savedAddresses.Select((address, index) => new SavedAddressDto
+                SavedAddresses = savedAddresses?.Select((address, index) => new SavedAddressDto
                 {
                     Id = index + 1,
                     Address = address
-                }).ToList()
+                }).ToList() ?? new List<SavedAddressDto>()
             };
 
             return View(checkoutViewModel);
@@ -540,10 +545,17 @@ namespace SilkSareeEcommerce.Controllers
 
             if (PaymentMethod == "PayPal")
             {
-                string returnUrl = Url.Action("PaymentSuccess", "Payment", null, Request.Scheme);
-                string cancelUrl = Url.Action("PaymentCancel", "Payment", null, Request.Scheme);
+                string? returnUrl = Url.Action("PaymentSuccess", "Payment", null, Request.Scheme);
+                string? cancelUrl = Url.Action("PaymentCancel", "Payment", null, Request.Scheme);
 
-                var payment = await _payPalService.CreatePaymentAsync(0,totalAmount, "USD", returnUrl, cancelUrl);
+                if (string.IsNullOrEmpty(returnUrl) || string.IsNullOrEmpty(cancelUrl))
+                {
+                    // Fallback to default URLs if generation fails
+                    returnUrl = $"{Request.Scheme}://{Request.Host}/Payment/PaymentSuccess";
+                    cancelUrl = $"{Request.Scheme}://{Request.Host}/Payment/PaymentCancel";
+                }
+
+                var payment = await _payPalService.CreatePaymentAsync(0, totalAmount, "USD", returnUrl, cancelUrl);
                 var approvalUrl = payment.links.FirstOrDefault(l => l.rel == "approval_url")?.href;
 
                 if (!string.IsNullOrEmpty(approvalUrl))

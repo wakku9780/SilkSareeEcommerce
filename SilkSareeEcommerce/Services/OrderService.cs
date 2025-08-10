@@ -186,7 +186,7 @@ namespace SilkSareeEcommerce.Services
             if (order == null) throw new Exception("Order not found!");
 
             // Access the ShippingAddress from the order (as it's a navigation property)
-            var shippingAddress = order.ShippingAddress?.Address;
+            var shippingAddress = order.ShippingAddress?.Address ?? "Address not specified";
 
             // Now, generate the invoice using the shipping address and other order details
             return _pdfService.GenerateOrderPdf(order, shippingAddress); // You can pass the shipping address too if required

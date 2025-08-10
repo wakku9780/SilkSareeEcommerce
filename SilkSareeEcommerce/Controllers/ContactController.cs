@@ -23,19 +23,19 @@ namespace SilkSareeEcommerce.Controllers
 
         [HttpPost]
         [Route("Contact/Submit")]
-        public IActionResult Submit(Contact model)
+        public async Task<IActionResult> Submit(Contact model)
         {
             if (ModelState.IsValid)
             {
                 // Save to database
                 _context.Contacts.Add(model);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 // Send Email to Admin
                 string subject = "New Contact Form Submission";
                 string body = $"<h2>New Contact Request</h2><p><strong>Name:</strong> {model.Name}</p><p><strong>Email:</strong> {model.Email}</p><p><strong>Message:</strong> {model.Message}</p>";
 
-                _emailService.SendEmail("wakku9780@gmail.com", subject, body);
+                await _emailService.SendEmailAsync("wakku9780@gmail.com", subject, body);
 
                 TempData["SuccessMessage"] = "Your message has been sent!";
                 return RedirectToAction("Index");

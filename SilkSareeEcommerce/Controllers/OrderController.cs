@@ -88,8 +88,8 @@ namespace SilkSareeEcommerce.Controllers
                     var user = await _userManager.FindByIdAsync(userId);
                     if (user != null)
                     {
-                        var shippingAddress = await _userService.GetAddressAsync(userId);
-                        var addressText = shippingAddress?.Address ?? "Address not specified";
+                        var savedAddresses = await _userService.GetListSavedAddressesAsync(userId);
+                        var addressText = savedAddresses?.FirstOrDefault()?.Address ?? "Address not specified";
                         
                         var emailSent = await _orderService.SendOrderConfirmationEmailAsync(order, user, addressText);
                         
@@ -349,7 +349,10 @@ namespace SilkSareeEcommerce.Controllers
                     var user = await _userManager.FindByIdAsync(userId);
                     if (user != null)
                     {
-                        var emailSent = await _orderService.SendOrderConfirmationEmailAsync(order, user, finalShippingAddress);
+                        var savedAddresses = await _userService.GetListSavedAddressesAsync(userId);
+                        var addressText = savedAddresses?.FirstOrDefault()?.Address ?? "Address not specified";
+                        
+                        var emailSent = await _orderService.SendOrderConfirmationEmailAsync(order, user, addressText);
                         
                         if (emailSent)
                         {
