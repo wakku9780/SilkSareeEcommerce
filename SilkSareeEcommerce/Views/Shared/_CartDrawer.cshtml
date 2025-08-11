@@ -1,18 +1,10 @@
 <!-- Cart Drawer -->
-<div x-show="cartOpen" 
-     x-transition:enter="transition ease-in-out duration-300"
-     x-transition:enter-start="translate-x-full"
-     x-transition:enter-end="translate-x-0"
-     x-transition:leave="transition ease-in-out duration-300"
-     x-transition:leave-start="translate-x-0"
-     x-transition:leave-end="translate-x-full"
-     class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-xl"
-     style="display: none;">
+<div id="cart-drawer" class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-xl transform translate-x-full transition-transform duration-300">
     
     <!-- Cart Header -->
     <div class="flex items-center justify-between p-6 border-b border-gray-200">
         <h2 class="text-lg font-semibold text-gray-900">Shopping Cart</h2>
-        <button @click="cartOpen = false" 
+        <button onclick="closeCart()" 
                 class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
                 aria-label="Close cart">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,7 +16,7 @@
     <!-- Cart Content -->
     <div class="flex-1 overflow-y-auto p-6">
         <!-- Empty Cart State -->
-        <div x-show="!cartItems || cartItems.length === 0" class="text-center py-12">
+        <div id="empty-cart" class="text-center py-12">
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"/>
             </svg>
@@ -32,7 +24,7 @@
             <p class="mt-1 text-sm text-gray-500">Start shopping to add items to your cart.</p>
             <div class="mt-6">
                 <a asp-controller="Product" asp-action="Index" 
-                   @click="cartOpen = false"
+                   onclick="closeCart()"
                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-luxury-600 hover:bg-luxury-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-luxury-500 transition-colors duration-200">
                     Start Shopping
                 </a>
@@ -40,7 +32,7 @@
         </div>
 
         <!-- Cart Items -->
-        <div x-show="cartItems && cartItems.length > 0" class="space-y-4">
+        <div id="cart-items" class="space-y-4 hidden">
             <!-- Sample Cart Item -->
             <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                 <img src="/images/sample-saree.jpg" alt="Silk Saree" class="w-16 h-16 object-cover rounded-md">
@@ -100,7 +92,7 @@
     </div>
 
     <!-- Cart Footer -->
-    <div x-show="cartItems && cartItems.length > 0" class="border-t border-gray-200 p-6">
+    <div id="cart-footer" class="border-t border-gray-200 p-6 hidden">
         <!-- Subtotal -->
         <div class="flex justify-between text-base font-medium text-gray-900 mb-4">
             <span>Subtotal</span>
@@ -113,11 +105,11 @@
         <!-- Action Buttons -->
         <div class="space-y-3">
             <a asp-controller="Order" asp-action="Checkout" 
-               @click="cartOpen = false"
+               onclick="closeCart()"
                class="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-luxury-600 hover:bg-luxury-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-luxury-500 transition-colors duration-200">
                 Proceed to Checkout
             </a>
-            <button @click="cartOpen = false"
+            <button onclick="closeCart()"
                     class="w-full flex justify-center items-center px-6 py-3 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-luxury-500 transition-colors duration-200">
                 Continue Shopping
             </button>
@@ -126,14 +118,43 @@
 </div>
 
 <!-- Cart Overlay -->
-<div x-show="cartOpen" 
-     x-transition:enter="transition-opacity ease-linear duration-300"
-     x-transition:enter-start="opacity-0"
-     x-transition:enter-end="opacity-100"
-     x-transition:leave="transition-opacity ease-linear duration-300"
-     x-transition:leave-start="opacity-100"
-     x-transition:leave-end="opacity-0"
-     class="fixed inset-0 z-40 bg-black bg-opacity-25"
-     style="display: none;"
-     @click="cartOpen = false">
+<div id="cart-overlay" class="fixed inset-0 z-40 bg-black bg-opacity-25 opacity-0 pointer-events-none transition-opacity duration-300"
+     onclick="closeCart()">
 </div>
+
+<script>
+    // Cart functionality
+    document.addEventListener('cart-open', function() {
+        openCart();
+    });
+
+    function openCart() {
+        const drawer = document.getElementById('cart-drawer');
+        const overlay = document.getElementById('cart-overlay');
+        
+        drawer.classList.remove('translate-x-full');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        
+        // Show sample cart items for demo
+        showCartItems();
+    }
+
+    function closeCart() {
+        const drawer = document.getElementById('cart-drawer');
+        const overlay = document.getElementById('cart-overlay');
+        
+        drawer.classList.add('translate-x-full');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function showCartItems() {
+        const emptyCart = document.getElementById('empty-cart');
+        const cartItems = document.getElementById('cart-items');
+        const cartFooter = document.getElementById('cart-footer');
+        
+        // For demo purposes, show items
+        emptyCart.classList.add('hidden');
+        cartItems.classList.remove('hidden');
+        cartFooter.classList.remove('hidden');
+    }
+</script>

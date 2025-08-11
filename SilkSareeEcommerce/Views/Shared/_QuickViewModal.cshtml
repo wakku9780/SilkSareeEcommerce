@@ -1,0 +1,184 @@
+<!-- Quick View Modal -->
+<div id="quick-view-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300"></div>
+    
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div class="relative bg-white w-full max-w-4xl rounded-lg shadow-xl">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">Quick View</h2>
+                <button onclick="closeQuickViewModal()" 
+                        class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                        aria-label="Close quick view">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Product Content -->
+            <div class="p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Product Images -->
+                    <div class="space-y-4">
+                        <div class="aspect-w-1 aspect-h-1 bg-gray-100 rounded-lg overflow-hidden">
+                            <img id="quick-view-main-image" src="/images/sample-saree.jpg" alt="Silk Saree" class="w-full h-full object-cover">
+                        </div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="changeMainImage('/images/sample-saree.jpg')" class="aspect-w-1 aspect-h-1 bg-gray-100 rounded-md overflow-hidden border-2 border-luxury-500">
+                                <img src="/images/sample-saree.jpg" alt="Silk Saree" class="w-full h-full object-cover">
+                            </button>
+                            <button onclick="changeMainImage('/images/sample-saree-2.jpg')" class="aspect-w-1 aspect-h-1 bg-gray-100 rounded-md overflow-hidden border-2 border-transparent hover:border-luxury-300">
+                                <img src="/images/sample-saree-2.jpg" alt="Silk Saree" class="w-full h-full object-cover">
+                            </button>
+                            <button onclick="changeMainImage('/images/sample-saree-3.jpg')" class="aspect-w-1 aspect-h-1 bg-gray-100 rounded-md overflow-hidden border-2 border-transparent hover:border-luxury-300">
+                                <img src="/images/sample-saree-3.jpg" alt="Silk Saree" class="w-full h-full object-cover">
+                            </button>
+                            <button onclick="changeMainImage('/images/sample-saree-4.jpg')" class="aspect-w-1 aspect-h-1 bg-gray-100 rounded-md overflow-hidden border-2 border-transparent hover:border-luxury-300">
+                                <img src="/images/sample-saree-4.jpg" alt="Silk Saree" class="w-full h-full object-cover">
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Details -->
+                    <div class="space-y-6">
+                        <div>
+                            <h3 id="quick-view-title" class="text-2xl font-semibold text-gray-900">Elegant Silk Saree</h3>
+                            <p id="quick-view-category" class="text-sm text-gray-500 mt-1">Traditional Collection</p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600">4.0 (24 reviews)</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <p id="quick-view-price" class="text-3xl font-bold text-luxury-600">₹2,999</p>
+                            <p class="text-sm text-gray-500 mt-1">Free shipping on orders above ₹5,000</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-900 mb-2">Description</h4>
+                            <p id="quick-view-description" class="text-sm text-gray-600 leading-relaxed">
+                                This elegant silk saree features traditional motifs and intricate embroidery work. 
+                                Perfect for special occasions, weddings, and festive celebrations. Made from pure silk 
+                                with a comfortable drape and beautiful fall.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-900 mb-2">Available Sizes</h4>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-luxury-500 hover:text-luxury-600 transition-colors duration-200">Free Size</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:border-luxury-500 hover:text-luxury-600 transition-colors duration-200">Custom</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-3 pt-4">
+                            <button onclick="addToCart()" 
+                                    class="flex-1 bg-luxury-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-luxury-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-luxury-500 transition-colors duration-200">
+                                Add to Cart
+                            </button>
+                            <button onclick="addToWishlist()" 
+                                    class="px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-luxury-500 transition-colors duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="#" class="text-luxury-600 hover:text-luxury-700 text-sm font-medium">
+                                View Full Details →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openQuickViewModal(productData) {
+        const modal = document.getElementById('quick-view-modal');
+        modal.classList.remove('hidden');
+        
+        // Populate product data
+        if (productData) {
+            document.getElementById('quick-view-title').textContent = productData.title || 'Elegant Silk Saree';
+            document.getElementById('quick-view-category').textContent = productData.category || 'Traditional Collection';
+            document.getElementById('quick-view-price').textContent = productData.price || '₹2,999';
+            document.getElementById('quick-view-description').textContent = productData.description || 'This elegant silk saree features traditional motifs and intricate embroidery work.';
+            
+            if (productData.image) {
+                document.getElementById('quick-view-main-image').src = productData.image;
+            }
+        }
+    }
+
+    function closeQuickViewModal() {
+        const modal = document.getElementById('quick-view-modal');
+        modal.classList.add('hidden');
+    }
+
+    function changeMainImage(imageSrc) {
+        document.getElementById('quick-view-main-image').src = imageSrc;
+        
+        // Update border styling
+        const thumbnails = document.querySelectorAll('#quick-view-modal .aspect-w-1 button');
+        thumbnails.forEach(btn => {
+            btn.classList.remove('border-luxury-500');
+            btn.classList.add('border-transparent');
+        });
+        
+        // Find and highlight current thumbnail
+        event.target.closest('button').classList.remove('border-transparent');
+        event.target.closest('button').classList.add('border-luxury-500');
+    }
+
+    function addToCart() {
+        // Add to cart functionality
+        console.log('Added to cart');
+        // You can integrate this with your existing cart system
+    }
+
+    function addToWishlist() {
+        // Add to wishlist functionality
+        console.log('Added to wishlist');
+        // You can integrate this with your existing wishlist system
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('quick-view-modal').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeQuickViewModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeQuickViewModal();
+        }
+    });
+</script>

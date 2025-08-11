@@ -15,14 +15,14 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="@Context.Request.GetDisplayUrl()" />
+    <meta property="og:url" content="@Context.Request.Scheme://@Context.Request.Host@Context.Request.Path" />
     <meta property="og:title" content="@ViewData["Title"] ?? "Silk Sarees - Premium Traditional Elegance" />
     <meta property="og:description" content="@ViewData["Description"] ?? "Discover exquisite silk sarees crafted with traditional artistry and modern elegance." />
     <meta property="og:image" content="@ViewData["Image"] ?? "/images/og-image.jpg" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="@Context.Request.GetDisplayUrl()" />
+    <meta property="twitter:url" content="@Context.Request.Scheme://@Context.Request.Host@Context.Request.Path" />
     <meta property="twitter:title" content="@ViewData["Title"] ?? "Silk Sarees - Premium Traditional Elegance" />
     <meta property="twitter:description" content="@ViewData["Description"] ?? "Discover exquisite silk sarees crafted with traditional artistry and modern elegance." />
     <meta property="twitter:image" content="@ViewData["Image"] ?? "/images/og-image.jpg" />
@@ -53,7 +53,7 @@
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "Silk Sarees E-commerce",
-        "url": "@Context.Request.GetDisplayUrl()",
+        "url": "@Context.Request.Scheme://@Context.Request.Host",
         "logo": "@Context.Request.Scheme://@Context.Request.Host/images/logo.png",
         "description": "Premium silk sarees crafted with traditional artistry and modern elegance"
     }
@@ -89,33 +89,33 @@
     <!-- Theme Switcher -->
     <div class="fixed bottom-6 right-6 z-50">
         <button 
-            @click="theme = theme === 'luxury' ? 'minimal' : 'luxury'"
+            onclick="document.dispatchEvent(new CustomEvent('theme-toggle'))"
             class="group relative bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
-            :title="theme === 'luxury' ? 'Switch to Minimal Theme' : 'Switch to Luxury Theme'"
+            title="Toggle theme"
             aria-label="Toggle theme">
             
             <!-- Luxury Theme Icon -->
-            <svg x-show="theme === 'luxury'" class="w-6 h-6 text-luxury-600" fill="currentColor" viewBox="0 0 20 20">
+            <svg id="luxury-icon" class="w-6 h-6 text-luxury-600" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
             </svg>
             
             <!-- Minimal Theme Icon -->
-            <svg x-show="theme === 'minimal'" class="w-6 h-6 text-pastel-600" fill="currentColor" viewBox="0 0 20 20">
+            <svg id="minimal-icon" class="w-6 h-6 text-pastel-600 hidden" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
             </svg>
             
             <!-- Tooltip -->
             <div class="absolute bottom-full right-0 mb-2 px-2 py-1 text-sm text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                <span x-text="theme === 'luxury' ? 'Minimal Theme' : 'Luxury Theme'"></span>
+                <span id="theme-tooltip">Minimal Theme</span>
             </div>
         </button>
     </div>
 
     <!-- Back to Top Button -->
     <button 
-        @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+        onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
         class="fixed bottom-6 left-6 z-50 bg-primary text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 hover:opacity-100"
-        :class="{ 'opacity-100': window.scrollY > 300 }"
+        id="back-to-top"
         aria-label="Back to top">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
@@ -152,6 +152,42 @@
                 imageObserver.observe(img);
             });
         }
+
+        // Theme switching functionality
+        document.addEventListener('theme-toggle', function() {
+            const currentTheme = localStorage.getItem('theme') || 'luxury';
+            const newTheme = currentTheme === 'luxury' ? 'minimal' : 'luxury';
+            localStorage.setItem('theme', newTheme);
+            
+            // Update UI
+            const body = document.body;
+            body.className = body.className.replace(/theme-\w+/, `theme-${newTheme}`);
+            
+            // Update icons
+            const luxuryIcon = document.getElementById('luxury-icon');
+            const minimalIcon = document.getElementById('minimal-icon');
+            const tooltip = document.getElementById('theme-tooltip');
+            
+            if (newTheme === 'luxury') {
+                luxuryIcon.classList.remove('hidden');
+                minimalIcon.classList.add('hidden');
+                tooltip.textContent = 'Minimal Theme';
+            } else {
+                luxuryIcon.classList.add('hidden');
+                minimalIcon.classList.remove('hidden');
+                tooltip.textContent = 'Luxury Theme';
+            }
+        });
+
+        // Back to top button visibility
+        window.addEventListener('scroll', function() {
+            const backToTop = document.getElementById('back-to-top');
+            if (window.scrollY > 300) {
+                backToTop.classList.add('opacity-100');
+            } else {
+                backToTop.classList.remove('opacity-100');
+            }
+        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
