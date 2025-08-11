@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Premium Silk Sarees E-commerce Platform",
   "scripts": {
-    "build:css": "tailwindcss -i ./wwwroot/css/site.css -o ./wwwroot/css/tailwind.css --watch",
-    "build:css:prod": "tailwindcss -i ./wwwroot/css/site.css -o ./wwwroot/css/tailwind.css --minify",
+    "build:css": "tailwindcss -i ./SilkSareeEcommerce/wwwroot/css/site.css -o ./SilkSareeEcommerce/wwwroot/css/tailwind.css --watch",
+    "build:css:prod": "tailwindcss -i ./SilkSareeEcommerce/wwwroot/css/site.css -o ./SilkSareeEcommerce/wwwroot/css/tailwind.css --minify",
     "dev": "npm run build:css"
   },
   "devDependencies": {

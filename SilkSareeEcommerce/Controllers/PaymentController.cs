@@ -33,7 +33,7 @@ namespace SilkSareeEcommerce.Controllers
             string cancelUrl = Url.Action("PaymentCancel", "Payment", null, Request.Scheme);
 
             // Call PayPal API to create a payment
-            var payment = await _payPalService.CreatePaymentAsync(orderId, amount, "USD", returnUrl, cancelUrl);
+                            var payment = _payPalService.CreatePayment(orderId, amount, "USD", returnUrl, cancelUrl);
 
             // Fix: Get the PayPal Payment approval URL
             var approvalUrl = payment.links.FirstOrDefault(l => l.rel == "approval_url")?.href;

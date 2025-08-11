@@ -109,12 +109,14 @@ namespace SilkSareeEcommerce.Controllers
                 ViewBag.Categories = new SelectList(await _categoryService.GetAllCategoriesAsync(), "Id", "Name");
                 return View(product);
             }
-            product.Category = await _categoryService.GetCategoryByIdAsync(product.CategoryId);
-
-            if (product.Category == null)
+            var category = await _categoryService.GetCategoryByIdAsync(product.CategoryId);
+            if (category == null)
             {
                 ModelState.AddModelError("CategoryId", "Invalid Category Selected");
+                ViewBag.Categories = new SelectList(await _categoryService.GetAllCategoriesAsync(), "Id", "Name");
+                return View(product);
             }
+            product.Category = category;
 
             using (var stream = imageFile.OpenReadStream())
             {
@@ -158,13 +160,14 @@ namespace SilkSareeEcommerce.Controllers
                 return NotFound();
             }
 
-            product.Category = await _categoryService.GetCategoryByIdAsync(product.CategoryId);
-            if (product.Category == null)
+            var category = await _categoryService.GetCategoryByIdAsync(product.CategoryId);
+            if (category == null)
             {
                 ModelState.AddModelError("CategoryId", "Invalid Category Selected");
                 ViewBag.Categories = new SelectList(await _categoryService.GetAllCategoriesAsync(), "Id", "Name", product.CategoryId);
                 return View(product);
             }
+            product.Category = category;
 
             if (imageFile != null && imageFile.Length > 0)
             {
@@ -309,7 +312,12 @@ namespace SilkSareeEcommerce.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateCartQuantity(int productId, string action)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // ✅ Current logged-in user ka ID le lo
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // ✅ Current logged-in user ka ID le lo
+            
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { success = false, message = "User not authenticated!" });
+            }
 
             var result = await _cartService.UpdateCartQuantityAsync(userId, productId, action);
 
@@ -555,7 +563,7 @@ namespace SilkSareeEcommerce.Controllers
                     cancelUrl = $"{Request.Scheme}://{Request.Host}/Payment/PaymentCancel";
                 }
 
-                var payment = await _payPalService.CreatePaymentAsync(0, totalAmount, "USD", returnUrl, cancelUrl);
+                var payment = _payPalService.CreatePayment(0, totalAmount, "USD", returnUrl, cancelUrl);
                 var approvalUrl = payment.links.FirstOrDefault(l => l.rel == "approval_url")?.href;
 
                 if (!string.IsNullOrEmpty(approvalUrl))

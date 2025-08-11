@@ -179,7 +179,7 @@ namespace SilkSareeEcommerce.Controllers
             if (ModelState.IsValid)
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var userName = User.Identity.Name;
+                var userName = User.Identity?.Name ?? "Anonymous User";
 
                 var review = new ProductReview
                 {

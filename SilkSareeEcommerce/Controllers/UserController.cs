@@ -111,6 +111,12 @@ namespace SilkSareeEcommerce.Controllers
         public async Task<IActionResult> EditProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "User not authenticated!";
+                return RedirectToAction("Index");
+            }
+            
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
             {
@@ -125,6 +131,11 @@ namespace SilkSareeEcommerce.Controllers
         public async Task<IActionResult> EditProfile(ApplicationUser model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get the current user's ID
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "User not authenticated!";
+                return RedirectToAction("Index");
+            }
 
             if (!ModelState.IsValid)
                 return View(model);

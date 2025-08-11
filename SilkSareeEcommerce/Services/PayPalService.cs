@@ -20,17 +20,23 @@ namespace SilkSareeEcommerce.Services
         {
             var clientId = _config["PayPal:ClientId"];
             var clientSecret = _config["PayPal:Secret"];
+            var mode = _config["PayPal:Mode"];
+
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret) || string.IsNullOrEmpty(mode))
+            {
+                throw new InvalidOperationException("PayPal configuration is incomplete. Please check your appsettings.json file.");
+            }
 
             var config = new Dictionary<string, string>
         {
-            { "mode", _config["PayPal:Mode"] }
+            { "mode", mode }
         };
 
             var accessToken = new OAuthTokenCredential(clientId, clientSecret, config).GetAccessToken();
             return new APIContext(accessToken) { Config = config };
         }
 
-        public async Task<PayPal.Api.Payment> CreatePaymentAsync(int orderId, decimal amount, string currency, string returnUrl, string cancelUrl)
+        public PayPal.Api.Payment CreatePayment(int orderId, decimal amount, string currency, string returnUrl, string cancelUrl)
         {
             var apiContext = GetAPIContext();
 

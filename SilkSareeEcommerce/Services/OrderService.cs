@@ -126,7 +126,7 @@ namespace SilkSareeEcommerce.Services
 
 
 
-        public async Task<Order> CreateOrderFromBuyNowAsync(string userId, Product product, int quantity, string paymentMethod)
+        public async Task<Order?> CreateOrderFromBuyNowAsync(string userId, Product product, int quantity, string paymentMethod)
         {
             if (product.Quantity < quantity)
             {
@@ -161,7 +161,7 @@ namespace SilkSareeEcommerce.Services
 
 
 
-        public async Task ConfirmOrderAsync(string userId, IEnumerable<CartItem> cartItems)
+        public Task ConfirmOrderAsync(string userId, IEnumerable<CartItem> cartItems)
         {
            // var order = await CreateOrderAsync(userId,   cartItems.ToList());
             //if (order != null)
@@ -169,6 +169,7 @@ namespace SilkSareeEcommerce.Services
             //    // Order confirmed, ab database me save karna hoga
             //    await _orderRepository.CreateOrderAsync(order);
             //}
+            return Task.CompletedTask;
         }
 
 

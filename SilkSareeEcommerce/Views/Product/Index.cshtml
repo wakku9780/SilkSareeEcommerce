@@ -3,7 +3,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    var query = HttpContextAccessor.HttpContext.Request.Query;
+    var query = HttpContextAccessor.HttpContext?.Request.Query;
 }
 
 <div class="container mt-4">

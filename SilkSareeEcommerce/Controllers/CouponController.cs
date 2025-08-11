@@ -68,6 +68,12 @@ namespace SilkSareeEcommerce.Controllers
         {
             // Get current cart from session or DB
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "User not authenticated!";
+                return RedirectToAction("ViewCart", "Product");
+            }
+            
             var cart = await _cartService.GetCartItemsAsync(userId); // Assume this gets cart items
             decimal cartTotal = cart.Sum(item => item.Product.Price * item.Quantity);
 
