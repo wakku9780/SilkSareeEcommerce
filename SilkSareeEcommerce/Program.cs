@@ -12,8 +12,19 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ✅ Check if configuration files exist
+var configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
+var devConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Development.json");
+Console.WriteLine($"🔍 Config file exists: {File.Exists(configPath)} - {configPath}");
+Console.WriteLine($"🔍 Dev config file exists: {File.Exists(devConfigPath)} - {devConfigPath}");
+
 // ✅ Debug configuration loading
 Console.WriteLine("🔍 Configuration Debug:");
+Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");
+var configKeys = builder.Configuration.AsEnumerable()
+    .Select(kvp => kvp.Key)
+    .Where(k => k.StartsWith("Cloudinary") || k.StartsWith("EmailSettings"));
+Console.WriteLine($"Configuration Keys: {string.Join(", ", configKeys)}");
 Console.WriteLine($"Cloudinary:CloudName = {builder.Configuration["Cloudinary:CloudName"]}");
 Console.WriteLine($"Cloudinary:ApiKey = {builder.Configuration["Cloudinary:ApiKey"]}");
 Console.WriteLine($"Cloudinary:ApiSecret = {(string.IsNullOrEmpty(builder.Configuration["Cloudinary:ApiSecret"]) ? "Empty" : "Present")}");
@@ -114,20 +125,8 @@ builder.Services.AddScoped<ProductReviewService>();
 
 
 
-// ✅ Register CloudinaryService with factory method to handle configuration loading
-builder.Services.AddSingleton<CloudinaryService>(serviceProvider =>
-{
-    try
-    {
-        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-        return new CloudinaryService(configuration);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"❌ CloudinaryService creation failed: {ex.Message}");
-        throw; // Re-throw to fail fast
-    }
-});
+// ✅ Register CloudinaryService as singleton - it will be created when first requested
+builder.Services.AddSingleton<CloudinaryService>();
 builder.Services.AddScoped<CouponService>();
 builder.Services.AddSingleton<FirebaseService>();
 
