@@ -12,6 +12,14 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ✅ Debug configuration loading
+Console.WriteLine("🔍 Configuration Debug:");
+Console.WriteLine($"Cloudinary:CloudName = {builder.Configuration["Cloudinary:CloudName"]}");
+Console.WriteLine($"Cloudinary:ApiKey = {builder.Configuration["Cloudinary:ApiKey"]}");
+Console.WriteLine($"Cloudinary:ApiSecret = {(string.IsNullOrEmpty(builder.Configuration["Cloudinary:ApiSecret"]) ? "Empty" : "Present")}");
+Console.WriteLine($"EmailSettings:SMTPServer = {builder.Configuration["EmailSettings:SMTPServer"]}");
+Console.WriteLine($"PayPal:ClientId = {builder.Configuration["PayPal:ClientId"]}");
+
 // ✅ Fix PostgreSQL DateTime timezone issues
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -106,7 +114,20 @@ builder.Services.AddScoped<ProductReviewService>();
 
 
 
-builder.Services.AddSingleton<CloudinaryService>();
+// ✅ Register CloudinaryService with factory method to handle configuration loading
+builder.Services.AddSingleton<CloudinaryService>(serviceProvider =>
+{
+    try
+    {
+        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+        return new CloudinaryService(configuration);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ CloudinaryService creation failed: {ex.Message}");
+        throw; // Re-throw to fail fast
+    }
+});
 builder.Services.AddScoped<CouponService>();
 builder.Services.AddSingleton<FirebaseService>();
 

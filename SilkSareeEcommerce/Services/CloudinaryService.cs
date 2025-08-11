@@ -9,12 +9,23 @@ namespace SilkSareeEcommerce.Services
 
         public CloudinaryService(IConfiguration configuration)
         {
-            var cloudName = configuration["Cloudinary:CloudName"];
-            var apiKey = configuration["Cloudinary:ApiKey"];
-            var apiSecret = configuration["Cloudinary:ApiSecret"];
+            // Try multiple configuration keys to handle different formats
+            var cloudName = configuration["Cloudinary:CloudName"] ?? 
+                           configuration["Cloudinary__CloudName"] ?? 
+                           Environment.GetEnvironmentVariable("Cloudinary__CloudName");
+            
+            var apiKey = configuration["Cloudinary:ApiKey"] ?? 
+                        configuration["Cloudinary__ApiKey"] ?? 
+                        Environment.GetEnvironmentVariable("Cloudinary__ApiKey");
+            
+            var apiSecret = configuration["Cloudinary:ApiSecret"] ?? 
+                           configuration["Cloudinary__ApiSecret"] ?? 
+                           Environment.GetEnvironmentVariable("Cloudinary__ApiSecret");
 
             // ✅ Add debugging and validation
             Console.WriteLine($"🔍 Cloudinary Config - CloudName: {cloudName}, ApiKey: {apiKey}, ApiSecret: {(string.IsNullOrEmpty(apiSecret) ? "Empty" : "Present")}");
+            Console.WriteLine($"🔍 Environment Variables - Cloudinary__CloudName: {Environment.GetEnvironmentVariable("Cloudinary__CloudName")}");
+            Console.WriteLine($"🔍 Environment Variables - Cloudinary__ApiKey: {Environment.GetEnvironmentVariable("Cloudinary__ApiKey")}");
 
             if (string.IsNullOrEmpty(cloudName))
             {

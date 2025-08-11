@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Ignore appsettings.json to prevent committing sensitive credentials
+SilkSareeEcommerce/appsettings.json
