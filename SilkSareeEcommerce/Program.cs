@@ -40,6 +40,7 @@ builder.Services.Configure<StaticFileOptions>(options =>
     options.ServeUnknownFileTypes = true;
 });
 
+//
  
 
 // Add services to the container.

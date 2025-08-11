@@ -117,6 +117,7 @@
 	</ItemGroup>
 
 	<!-- ✅ THIS BLOCK IS REQUIRED -->
+	
 	<ItemGroup>
 		<Content Update="wwwroot\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
