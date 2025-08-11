@@ -1,356 +1,159 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth" x-data="{ 
+    theme: localStorage.getItem('theme') || 'luxury',
+    mobileMenuOpen: false,
+    cartOpen: false,
+    searchOpen: false,
+    userMenuOpen: false
+}" x-init="$watch('theme', val => localStorage.setItem('theme', val))">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SilkSareeEcommerce</title>
-    <!-- ✅ Add fallbacks for static files -->
-    <script src="~/lib/jquery/dist/jquery.min.js" 
-            asp-fallback-src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"
-            asp-fallback-test="window.jQuery"></script>
+    <meta name="description" content="@ViewData["Description"] ?? "Discover exquisite silk sarees crafted with traditional artistry and modern elegance. Premium quality, authentic designs, and timeless beauty." />
+    <meta name="keywords" content="@ViewData["Keywords"] ?? "silk sarees, traditional sarees, designer sarees, wedding sarees, ethnic wear, Indian fashion" />
+    <meta name="author" content="Silk Sarees E-commerce" />
     
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" 
-          asp-fallback-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          asp-fallback-test-class="sr-only" 
-          asp-fallback-test-property="position" 
-          asp-fallback-test-value="absolute" />
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@Context.Request.GetDisplayUrl()" />
+    <meta property="og:title" content="@ViewData["Title"] ?? "Silk Sarees - Premium Traditional Elegance" />
+    <meta property="og:description" content="@ViewData["Description"] ?? "Discover exquisite silk sarees crafted with traditional artistry and modern elegance." />
+    <meta property="og:image" content="@ViewData["Image"] ?? "/images/og-image.jpg" />
     
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SilkSareeEcommerce.styles.css" asp-append-version="true" />
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="@Context.Request.GetDisplayUrl()" />
+    <meta property="twitter:title" content="@ViewData["Title"] ?? "Silk Sarees - Premium Traditional Elegance" />
+    <meta property="twitter:description" content="@ViewData["Description"] ?? "Discover exquisite silk sarees crafted with traditional artistry and modern elegance." />
+    <meta property="twitter:image" content="@ViewData["Image"] ?? "/images/og-image.jpg" />
+    
+    <title>@ViewData["Title"] - Silk Sarees</title>
+    
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600&display=swap" as="style">
+    
+    <!-- Theme-specific CSS classes -->
+    <style>
+        .theme-luxury { --primary: #e35a0f; --secondary: #f59e0b; --accent: #be185d; --text: #1f2937; --bg: #ffffff; }
+        .theme-minimal { --primary: #64748b; --secondary: #94a3b8; --accent: #ec4899; --text: #334155; --bg: #f8fafc; }
+    </style>
+    
+    <!-- Tailwind CSS -->
+    <link href="~/css/tailwind.css" rel="stylesheet" />
+    
+    <!-- Custom CSS -->
+    <link href="~/css/site.css" rel="stylesheet" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Silk Sarees E-commerce",
+        "url": "@Context.Request.GetDisplayUrl()",
+        "logo": "@Context.Request.Scheme://@Context.Request.Host/images/logo.png",
+        "description": "Premium silk sarees crafted with traditional artistry and modern elegance"
+    }
+    </script>
+</head>
 
-    @RenderSection("Styles", required: false)
+<body class="theme-luxury" :class="theme === 'luxury' ? 'theme-luxury' : 'theme-minimal'">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-white px-4 py-2 rounded-md z-50">
+        Skip to main content
+    </a>
 
-  @*   <script>
-        tailwind.config = {
-          prefix: 'tw-',
+    <!-- Header -->
+    <partial name="_Header" />
+
+    <!-- Main Content -->
+    <main id="main-content" class="min-h-screen">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <partial name="_Footer" />
+
+    <!-- Cart Drawer -->
+    <partial name="_CartDrawer" />
+
+    <!-- Search Modal -->
+    <partial name="_SearchModal" />
+
+    <!-- Quick View Modal -->
+    <partial name="_QuickViewModal" />
+
+    <!-- Theme Switcher -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button 
+            @click="theme = theme === 'luxury' ? 'minimal' : 'luxury'"
+            class="group relative bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
+            :title="theme === 'luxury' ? 'Switch to Minimal Theme' : 'Switch to Luxury Theme'"
+            aria-label="Toggle theme">
+            
+            <!-- Luxury Theme Icon -->
+            <svg x-show="theme === 'luxury'" class="w-6 h-6 text-luxury-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            
+            <!-- Minimal Theme Icon -->
+            <svg x-show="theme === 'minimal'" class="w-6 h-6 text-pastel-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+            </svg>
+            
+            <!-- Tooltip -->
+            <div class="absolute bottom-full right-0 mb-2 px-2 py-1 text-sm text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                <span x-text="theme === 'luxury' ? 'Minimal Theme' : 'Luxury Theme'"></span>
+            </div>
+        </button>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button 
+        @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+        class="fixed bottom-6 left-6 z-50 bg-primary text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 hover:opacity-100"
+        :class="{ 'opacity-100': window.scrollY > 300 }"
+        aria-label="Back to top">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
+    </button>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="~/js/site.js"></script>
+    
+    <!-- Lazy Loading -->
+    <script>
+        // Intersection Observer for lazy loading images
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                imageObserver.observe(img);
+            });
         }
     </script>
-    <script src="https://cdn.tailwindcss.com"></script> *@
 
-  @*   <script src="https://cdn.tailwindcss.com"></script> *@
-
-
-    <!-- ✅ Font Awesome for wishlist icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <style>
-        html {
-            position: relative;
-            min-height: 100%;
-        }
-
-        body {
-            margin: 0;
-            margin-bottom: 60px;
-        }
-
-        .wrapper {
-            min-height: calc(100vh - 60px);
-            padding-bottom: 60px;
-        }
-
-        .content {
-            padding-bottom: 20px;
-        }
-
-        .footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 60px;
-            background-color: #343a40;
-            color: #ffffff;
-            text-align: center;
-            line-height: 60px;
-        }
-
-        .table-responsive, form {
-            margin-bottom: 80px;
-        }
-
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-    </style>
-</head>
-<body>
-    <div class="wrapper">
-        <header>
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
-                <div class="container-fluid">
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SilkSareeEcommerce</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                        <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/Contact">Contact Us</a>
-                            </li>
-
-                            @if (User.Identity.IsAuthenticated)
-                            {
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <li class="nav-item">
-                                        <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Dashboard">Admin Panel</a>
-                                    </li>
-                                }
-
-                                <li class="nav-item">
-                                    <a class="nav-link" href="@Url.Action("Index", "Product")">Product Feed</a>
-                                </li>
-
-                                <!-- ✅ Wishlist link for logged-in users -->
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Wishlist" asp-action="Index">
-                                        <i class="fas fa-heart text-danger"></i> Wishlist
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout (@User.Identity.Name)</a>
-                                </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        </header>
-
-        <div class="container-fluid content">
-            <partial name="_TempDataMessages" />
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
-        </div>
-
-        <footer class="footer">
-            <div class="container">
-                &copy; 2025 - SilkSareeEcommerce - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-            </div>
-        </footer>
-    </div>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
-
-
-
-@* <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SilkSareeEcommerce</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SilkSareeEcommerce.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <style>
-        /* ✅ Footer Fix */
-        /* Delete all previous footer-related styles and use only these */
-
-        html {
-            position: relative;
-            min-height: 100%;
-        }
-
-        body {
-            margin: 0;
-            margin-bottom: 60px; /* Height of the footer */
-        }
-
-        .wrapper {
-            min-height: calc(100vh - 60px); /* Viewport height minus footer height */
-            padding-bottom: 60px; /* Space for footer */
-        }
-
-        .content {
-            padding-bottom: 20px; /* Extra space before footer */
-        }
-
-        .footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 60px; /* Set footer height */
-            background-color: #343a40;
-            color: #ffffff;
-            text-align: center;
-            line-height: 60px; /* Center text vertically */
-        }
-
-        /* Ensure table and form content don't get hidden */
-        .table-responsive, form {
-            margin-bottom: 80px;
-        }
-
-        /* Clear any floats */
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-
-    </style>
-</head>
-<body>
-    <div class="wrapper">
-        <header>
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
-                <div class="container-fluid">
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SilkSareeEcommerce</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                        <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/Contact">Contact Us</a>
-                            </li>
-                            @if (User.Identity.IsAuthenticated)
-                            {
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <li class="nav-item">
-                                        <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Dashboard">Admin Panel</a>
-                                    </li>
-                                }
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout (@User.Identity.Name)</a>
-                                </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        </header>
-
-        <!-- ✅ Yeh dynamically content expand hone dega -->
-        <div class="container-fluid content">
-            @Html.Partial("_TempDataMessages")
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
-        </div>
-
-        <footer class="footer">
-            <div class="container">
-                &copy; 2025 - SilkSareeEcommerce - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-            </div>
-        </footer>
-    </div>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
-
-</html>
- *@
-
-
-@* <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SilkSareeEcommerce</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SilkSareeEcommerce.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SilkSareeEcommerce</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Dashboard">Admin Panel</a>
-                                </li>
-                            }
-
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout (@User.Identity.Name)</a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                            </li>
-                        }
-
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - SilkSareeEcommerce - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
-</html>
- *@
